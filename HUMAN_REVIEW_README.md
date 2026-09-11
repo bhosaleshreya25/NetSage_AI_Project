@@ -35,13 +35,13 @@ python human_review.py --cases 10 11 12
 Set reviewer name:
 
 ```powershell
-python human_review.py --reviewer "Gandhar"
+python human_review.py --reviewer "Shreya"
 ```
 
 Both options can be combined:
 
 ```powershell
-python human_review.py --reviewer "Gandhar" --cases 10 11 12
+python human_review.py --reviewer "Shreya" --cases 10 11 12
 ```
 
 ## Important
