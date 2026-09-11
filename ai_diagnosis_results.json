@@ -1,0 +1,1103 @@
+{
+  "tool": "NetSage AI - AI Diagnosis Runner",
+  "total_cases": 31,
+  "successful_diagnoses": 31,
+  "failed_diagnoses": 0,
+  "ai_rule_agreements": 31,
+  "expected_fault_agreements": 30,
+  "ai_agreement_rate": 96.77,
+  "results": [
+    {
+      "case_id": "10",
+      "diagnosis": {
+        "case_id": "10",
+        "root_cause": "Duplicate IP address conflict involving 192.168.1.10.",
+        "confidence": "high",
+        "evidence": [
+          "Cisco reports %IP-4-DUPADDR for 192.168.1.10 on GigabitEthernet0/0/0.",
+          "The syslog message indicates the IP is sourced by a second MAC address 00e0.8f3c.6901."
+        ],
+        "next_command": "show arp",
+        "fix_steps": [
+          "Identify the devices using the IP address 192.168.1.10.",
+          "Change the IP address on one of the conflicting devices to a unique value.",
+          "Verify that the IP conflict message stops and connectivity stabilizes."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: duplicate/ip."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "DUPLICATE_IP",
+          "fault": "Duplicate IP address conflict involving 192.168.1.10.",
+          "confidence": "High",
+          "evidence": "Cisco reports a duplicate address for 192.168.1.10.",
+          "next_command": "show arp",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "11",
+      "diagnosis": {
+        "case_id": "11",
+        "root_cause": "Trunk native VLAN mismatch between connected switches on interface FastEthernet0/1.",
+        "confidence": "high",
+        "evidence": [
+          "CDP syslog reports a native VLAN mismatch on FastEthernet0/1 with VLAN 20 configured locally and VLAN 10 on the neighbor switch.",
+          "show interface trunk indicates FastEthernet0/1 has Native vlan set to 20."
+        ],
+        "next_command": "show cdp neighbors detail",
+        "fix_steps": [
+          "Access the configuration mode for interface FastEthernet0/1.",
+          "Configure the correct native VLAN to match the neighbor switch using 'switchport trunk native vlan 10'.",
+          "Verify that the CDP native VLAN mismatch syslog messages stop."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: native/vlan."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "NATIVE_VLAN_MISMATCH",
+          "fault": "Switch port native VLAN mismatch.",
+          "confidence": "High",
+          "evidence": "CDP reports a native VLAN mismatch: VLAN 20 versus VLAN 10.",
+          "next_command": "show interfaces trunk",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "12",
+      "diagnosis": {
+        "case_id": "12",
+        "root_cause": "Port security violation caused the switch port FastEthernet0/1 to transition to Secure-shutdown because a new MAC address connected after a computer replacement.",
+        "confidence": "high",
+        "evidence": [
+          "Port status is Secure-shutdown.",
+          "Security Violation Count is 1.",
+          "Maximum MAC Addresses is 1 and Sticky MAC Addresses is 1."
+        ],
+        "next_command": "show interfaces FastEthernet0/1",
+        "fix_steps": [
+          "Access the switch configuration mode.",
+          "Enter interface FastEthernet0/1 and issue 'shutdown' followed by 'no shutdown' to clear the err-disabled/shutdown state.",
+          "Clear or update the sticky MAC address configuration if a new computer is permanently attached."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: port/security."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "PORT_SECURITY_VIOLATION",
+          "fault": "Port security maximum violation caused the port to enter an err-disabled/shutdown state.",
+          "confidence": "High",
+          "evidence": "Port status is Secure-shutdown and Security Violation Count is 1.",
+          "next_command": "show port-security interface <interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "13",
+      "diagnosis": {
+        "case_id": "13",
+        "root_cause": "Router-on-a-Stick sub-interface GigabitEthernet0/0/0.10 is configured with encapsulation dot1Q 20 instead of matching VLAN 10.",
+        "confidence": "high",
+        "evidence": [
+          "The sub-interface is named GigabitEthernet0/0/0.10, indicating VLAN 10.",
+          "The configuration shows encapsulation dot1Q 20."
+        ],
+        "next_command": "show running-config interface g0/0/0.10",
+        "fix_steps": [
+          "Enter interface configuration mode for GigabitEthernet0/0/0.10.",
+          "Change the dot1Q encapsulation to match VLAN 10 using 'encapsulation dot1Q 10'.",
+          "Verify connectivity from end hosts in VLAN 10 to their default gateway."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "SUBINTERFACE_VLAN_MISMATCH",
+          "fault": "Router-on-a-Stick sub-interface VLAN tag mismatch. Sub-interface g0/0/0.10 uses VLAN 20 instead of VLAN 10.",
+          "confidence": "High",
+          "evidence": "Interface suffix indicates VLAN 10, but encapsulation dot1Q uses VLAN 20.",
+          "next_command": "show running-config interface g0/0/0.10",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "14",
+      "diagnosis": {
+        "case_id": "14",
+        "root_cause": "The parent physical interface GigabitEthernet0/0/0 is administratively down, causing all associated sub-interfaces (GigabitEthernet0/0/0.10, GigabitEthernet0/0/0.20, and GigabitEthernet0/0/0.30) to remain down and breaking inter-VLAN routing.",
+        "confidence": "high",
+        "evidence": [
+          "GigabitEthernet0/0/0 is in administratively down status.",
+          "Dependent sub-interfaces GigabitEthernet0/0/0.10, GigabitEthernet0/0/0.20, and GigabitEthernet0/0/0.30 are all down/down."
+        ],
+        "next_command": "show running-config interface GigabitEthernet0/0/0",
+        "fix_steps": [
+          "Enter global configuration mode and access interface GigabitEthernet0/0/0.",
+          "Execute the 'no shutdown' command to bring up the physical interface.",
+          "Verify that the physical interface and its sub-interfaces transition to up/up using 'show ip interface brief'."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: parent/interface/down."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "PARENT_INTERFACE_DOWN",
+          "fault": "Parent interface GigabitEthernet0/0/0 is administratively down, causing dependent sub-interfaces to remain down.",
+          "confidence": "High",
+          "evidence": "GigabitEthernet0/0/0 is administratively down and 3 dependent sub-interface(s) are also down.",
+          "next_command": "show ip interface brief",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "15",
+      "diagnosis": {
+        "case_id": "15",
+        "root_cause": "EtherChannel bundle fails to negotiate because the member ports (Fa0/1 and Fa0/2) remain in stand-alone (I) state instead of bundling into Po1.",
+        "confidence": "high",
+        "evidence": [
+          "show etherchannel summary indicates Port-channel Po1(SD) is down.",
+          "Member ports Fa0/1 and Fa0/2 are marked with flag (I) for stand-alone."
+        ],
+        "next_command": "show running-config interface range FastEthernet0/1 - 2",
+        "fix_steps": [
+          "Verify channel-group and mode settings on both ends of the EtherChannel link.",
+          "Ensure compatible LACP settings and physical link configurations on the remote switch.",
+          "Check interface statuses and re-enable interfaces if necessary."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "disagree",
+        "reason": "AI root cause does not sufficiently match the expected fault."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "ETHERCHANNEL_PROTOCOL_MISMATCH",
+          "fault": "EtherChannel protocol/mode mismatch is preventing the port-channel from forming.",
+          "confidence": "Medium",
+          "evidence": "show etherchannel summary reports LACP while member ports remain stand-alone (I), and the symptom states that the bundle fails to negotiate.",
+          "next_command": "show etherchannel summary",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "16",
+      "diagnosis": {
+        "case_id": "16",
+        "root_cause": "EtherChannel consistency check failure due to mismatched allowed VLAN lists on member ports FastEthernet0/1 and FastEthernet0/2.",
+        "confidence": "high",
+        "evidence": [
+          "Cisco reports %EC-5-CANNOT_BUNDLE2: Fa0/1 is not compatible with Fa0/2 and will be suspended.",
+          "FastEthernet0/1 is configured with allowed VLANs 10,20.",
+          "FastEthernet0/2 is configured with allowed VLANs 10,30."
+        ],
+        "next_command": "show etherchannel summary",
+        "fix_steps": [
+          "Configure identical allowed VLAN lists on both FastEthernet0/1 and FastEthernet0/2.",
+          "Verify that the Port-Channel successfully bundles the member ports."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: etherchannel/vlan."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "ETHERCHANNEL_VLAN_MISMATCH",
+          "fault": "EtherChannel member ports have mismatched allowed VLAN lists.",
+          "confidence": "High",
+          "evidence": "fa0/1: VLANs 10,20, fa0/2: VLANs 10,30",
+          "next_command": "show etherchannel summary",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "17",
+      "diagnosis": {
+        "case_id": "17",
+        "root_cause": "The router subinterface GigabitEthernet0/0.10 is missing the IP helper address configuration required to forward DHCP requests to a DHCP server.",
+        "confidence": "high",
+        "evidence": [
+          "PC0 fails to obtain an IP address via DHCP and remains at 0.0.0.0.",
+          "The configuration for interface GigabitEthernet0/0.10 shows no 'ip helper-address' command."
+        ],
+        "next_command": "show running-config interface GigabitEthernet0/0.10",
+        "fix_steps": [
+          "Configure the 'ip helper-address <DHCP-server-IP>' command on interface GigabitEthernet0/0.10.",
+          "Verify the configuration with show running-config interface GigabitEthernet0/0.10.",
+          "Release and renew the DHCP lease on PC0."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "DHCP_RELAY_MISSING",
+          "fault": "DHCP relay agent is missing on GigabitEthernet0/0.10; no ip helper-address is configured.",
+          "confidence": "High",
+          "evidence": "DHCP failure evidence is present and GigabitEthernet0/0.10 has no ip helper-address in the supplied configuration.",
+          "next_command": "show running-config interface GigabitEthernet0/0.10",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "18",
+      "diagnosis": {
+        "case_id": "18",
+        "root_cause": "PortFast is incorrectly enabled on an inter-switch trunk port (FastEthernet0/1), risking temporary Layer-2 loops.",
+        "confidence": "high",
+        "evidence": [
+          "Switch0 shows interface FastEthernet0/1 is trunking with mode 'on'.",
+          "Spanning-tree details for interface FastEthernet0/1 explicitly state that the port is in the portfast mode."
+        ],
+        "next_command": "show spanning-tree interface FastEthernet0/1 detail",
+        "fix_steps": [
+          "Access global configuration mode on Switch0.",
+          "Navigate to interface FastEthernet0/1.",
+          "Disable PortFast on the trunk interface using 'no spanning-tree portfast'.",
+          "Verify Spanning Tree status on the interface using 'show spanning-tree interface FastEthernet0/1 detail'."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: portfast/trunk."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "PORTFAST_ON_TRUNK",
+          "fault": "PortFast is incorrectly enabled on an inter-switch trunk.",
+          "confidence": "High",
+          "evidence": "The interface is operating as a trunk while the spanning-tree output reports PortFast mode.",
+          "next_command": "show spanning-tree interface <interface> detail",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "19",
+      "diagnosis": {
+        "case_id": "19",
+        "root_cause": "Router0 has a static route to 192.168.20.0/24 configured with an invalid next-hop address (10.1.1.5) that is not on the directly connected subnet.",
+        "confidence": "high",
+        "evidence": [
+          "Router0's routing table shows a static route S 192.168.20.0/24 via 10.1.1.5.",
+          "The directly connected network on GigabitEthernet0/0/0 is 10.1.1.0/30, meaning 10.1.1.5 is outside the subnet and unreachable."
+        ],
+        "next_command": "show ip route 192.168.20.0",
+        "fix_steps": [
+          "Remove the incorrect static route pointing to 10.1.1.5.",
+          "Configure the static route to 192.168.20.0/24 using the correct valid next-hop IP address on the 10.1.1.0/30 segment.",
+          "Verify the route is installed in Router0's routing table and retest connectivity."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: static/route."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "INVALID_STATIC_NEXT_HOP",
+          "fault": "Static route to 192.168.20.0/24 uses an invalid next-hop address 10.1.1.5.",
+          "confidence": "High",
+          "evidence": "Configured next hop 10.1.1.5 does not belong to the directly connected network(s): 10.1.1.0/30.",
+          "next_command": "show ip route",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "20",
+      "diagnosis": {
+        "case_id": "20",
+        "root_cause": "Router1 lacks a route to reach the 192.168.10.0/24 network, resulting in a missing return path for traffic from PC0.",
+        "confidence": "high",
+        "evidence": [
+          "Router1 routing table shows no route to network 192.168.10.0/24.",
+          "Ping from Router1 to 192.168.10.10 failed with a 0 percent success rate."
+        ],
+        "next_command": "show ip route 192.168.10.0",
+        "fix_steps": [
+          "Configure a static route on Router1 for the 192.168.10.0/24 network pointing to the next-hop IP on Router0.",
+          "Verify the route is present in Router1's routing table using show ip route.",
+          "Test end-to-end connectivity between the PCs again."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: return/route."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "MISSING_RETURN_ROUTE",
+          "fault": "Reverse route to the remote 192.168.10.0/24 network is missing from Router1.",
+          "confidence": "High",
+          "evidence": "Router1 fails to ping the remote host and its supplied routing table contains no route to 192.168.10.0/24.",
+          "next_command": "show ip route 192.168.10.0",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "21",
+      "diagnosis": {
+        "case_id": "21",
+        "root_cause": "Floating static route is not properly configured as a backup because both static routes to 192.168.20.0/24 share the same administrative distance of 1, causing traffic to load-balance instead of failing over.",
+        "confidence": "high",
+        "evidence": [
+          "Running configuration shows two static routes for 192.168.20.0/24 with no specified administrative distance (defaulting to 1).",
+          "Routing table entry for 192.168.20.0/24 shows both 10.1.1.2 and 10.2.2.2 as active next hops with equal traffic share counts."
+        ],
+        "next_command": "show ip route 192.168.20.0",
+        "fix_steps": [
+          "Modify the backup static route configuration to include a higher administrative distance (e.g., ip route 192.168.20.0 255.255.255.0 10.2.2.2 5).",
+          "Verify the routing table shows only the primary route when the primary link is up, and the floating static route when the primary link fails."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: static/route."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "FLOATING_STATIC_ROUTE_AD",
+          "fault": "Multiple static routes to 192.168.20.0/24 have the same administrative distance.",
+          "confidence": "High",
+          "evidence": "All detected static routes use AD 1; a backup route should use a higher AD than the primary route.",
+          "next_command": "show ip route 192.168.20.0",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "22",
+      "diagnosis": {
+        "case_id": "22",
+        "root_cause": "OSPF neighbor adjacency failure due to a mismatched Hello timer interval.",
+        "confidence": "high",
+        "evidence": [
+          "Syslog reports %OSPF-5-ADJCHG: Process 1, Nbr 192.168.2.1 on GigabitEthernet0/0/0 from FULL to DOWN, Neighbor Down: Dead timer expired.",
+          "show ip ospf interface g0/0/0 displays Timer intervals configured with Hello 5, Dead 40."
+        ],
+        "next_command": "show ip ospf neighbor",
+        "fix_steps": [
+          "Check the OSPF Hello timer configuration on the neighboring router.",
+          "Ensure the Hello and Dead timers match on both sides of the OSPF link.",
+          "Verify that the OSPF adjacency returns to the FULL state."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: ospf/hello."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "OSPF_HELLO_TIMER",
+          "fault": "OSPF Hello interval is configured as 5 seconds instead of the default 10 seconds.",
+          "confidence": "Medium",
+          "evidence": "show ip ospf interface reports Hello 5.",
+          "next_command": "show ip ospf interface <interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "23",
+      "diagnosis": {
+        "case_id": "23",
+        "root_cause": "OSPF area ID mismatch between Router0 (Area 0) and Router1 (Area 1) on interface GigabitEthernet0/0/0.",
+        "confidence": "high",
+        "evidence": [
+          "Cisco reports %OSPF-4-ERRRCV indicating an invalid packet due to a mismatch area ID from 10.1.1.2 on GigabitEthernet0/0/0.",
+          "Router0 interface GigabitEthernet0/0/0 is configured in Area 0.",
+          "Router1 interface GigabitEthernet0/0/0 is configured in Area 1."
+        ],
+        "next_command": "show ip ospf neighbor",
+        "fix_steps": [
+          "Verify the OSPF area configuration on both routers.",
+          "Update the network statement or interface configuration so that both routers are in the same OSPF area.",
+          "Verify that the OSPF neighbor adjacency successfully forms."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: ospf/area."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "OSPF_AREA_MISMATCH",
+          "fault": "OSPF area ID mismatch between neighboring interfaces.",
+          "confidence": "High",
+          "evidence": "Detected different OSPF areas: 0, 1.",
+          "next_command": "show ip ospf interface <interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "24",
+      "diagnosis": {
+        "case_id": "24",
+        "root_cause": "OSPF is configured as a passive interface on the transit link GigabitEthernet0/0/0, suppressing hello packets and preventing neighbor adjacency.",
+        "confidence": "high",
+        "evidence": [
+          "The command show ip ospf interface g0/0/0 reports 'No Hellos (Passive interface)'."
+        ],
+        "next_command": "show running-config | section ospf",
+        "fix_steps": [
+          "Enter router OSPF configuration mode.",
+          "Remove the passive-interface configuration from GigabitEthernet0/0/0 using 'no passive-interface GigabitEthernet0/0/0'.",
+          "Verify OSPF neighbor adjacency is established using 'show ip ospf neighbor'."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: ospf/hello."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "OSPF_PASSIVE_INTERFACE",
+          "fault": "OSPF passive-interface is enabled on a transit link.",
+          "confidence": "High",
+          "evidence": "The OSPF interface output explicitly reports 'No Hellos (Passive interface)'.",
+          "next_command": "show ip ospf interface <interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "25",
+      "diagnosis": {
+        "case_id": "25",
+        "root_cause": "A standard IP access list is applied inbound on the WAN interface, causing unintended filtering of ingress traffic.",
+        "confidence": "high",
+        "evidence": [
+          "GigabitEthernet0/0/0 shows an inbound access list 10 applied.",
+          "Access list 10 is defined as a standard IP access list."
+        ],
+        "next_command": "show access-lists 10",
+        "fix_steps": [
+          "Remove access list 10 from the inbound direction of GigabitEthernet0/0/0.",
+          "Reapply the access list in the correct direction or review the placement closer to the source."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "STANDARD_ACL_DIRECTION",
+          "fault": "Standard ACL is applied inbound on the inspected interface; for the supplied WAN scenario this is the wrong direction.",
+          "confidence": "Medium",
+          "evidence": "Interface shows inbound ACL 10, and ACL 10 is a standard IP ACL.",
+          "next_command": "show ip interface <interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "26",
+      "diagnosis": {
+        "case_id": "26",
+        "root_cause": "The inbound access list WAN_IN on GigabitEthernet0/0/0 permits ICMP traffic but lacks a rule to permit established TCP return traffic, causing web traffic failures.",
+        "confidence": "high",
+        "evidence": [
+          "Extended IP access list WAN_IN only contains a permit for icmp any any.",
+          "Inbound access list WAN_IN is applied to GigabitEthernet0/0/0.",
+          "Outgoing access list is not set."
+        ],
+        "next_command": "show access-lists WAN_IN",
+        "fix_steps": [
+          "Enter global configuration mode on Router0.",
+          "Add a rule to the WAN_IN access list to permit established TCP traffic (e.g., 'permit tcp any any established').",
+          "Verify web traffic connectivity and access list hit counts."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: established/tcp."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "MISSING_ESTABLISHED_TCP",
+          "fault": "Extended ACL permits ICMP but lacks a permit for established TCP traffic.",
+          "confidence": "High",
+          "evidence": "ACL contains an ICMP permit but no 'permit tcp ... established' rule.",
+          "next_command": "show access-lists",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "27",
+      "diagnosis": {
+        "case_id": "27",
+        "root_cause": "The inbound extended ACL FILTER_LAN on interface GigabitEthernet0/0.10 only permits HTTP and HTTPS traffic, blocking essential UDP services such as DHCP (ports 67/68) and DNS (port 53).",
+        "confidence": "high",
+        "evidence": [
+          "Router0 shows an inbound access list FILTER_LAN applied to GigabitEthernet0/0.10.",
+          "FILTER_LAN only permits tcp traffic for eq www and eq 443.",
+          "DHCP and DNS traffic using UDP are not permitted by the access list."
+        ],
+        "next_command": "show access-lists FILTER_LAN",
+        "fix_steps": [
+          "Modify the FILTER_LAN access list to explicitly permit UDP traffic for DHCP (ports 67 and 68) and DNS (port 53).",
+          "Verify client IP address lease renewal and hostname resolution."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: dns/dhcp/udp."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "ACL_BLOCKS_UDP_SERVICES",
+          "fault": "Extended ACL does not explicitly permit required DNS/DHCP UDP traffic.",
+          "confidence": "High",
+          "evidence": "Missing explicit permit(s): DNS/UDP 53, DHCP/UDP 67/68.",
+          "next_command": "show access-lists",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "28",
+      "diagnosis": {
+        "case_id": "28",
+        "root_cause": "The LAN interface (GigabitEthernet0/0/1) is missing the 'ip nat inside' configuration, preventing NAT translation for private IP packets.",
+        "confidence": "high",
+        "evidence": [
+          "Router0 show ip interface g0/0/1 confirms that Network address translation is disabled.",
+          "Router0 show ip interface g0/0/0 confirms that GigabitEthernet0/0/0 is configured as NAT outside."
+        ],
+        "next_command": "show running-config interface GigabitEthernet0/0/1",
+        "fix_steps": [
+          "Access global configuration mode on Router0.",
+          "Enter interface configuration mode for GigabitEthernet0/0/1.",
+          "Apply the 'ip nat inside' command to the interface.",
+          "Verify the NAT interface configuration using 'show ip nat translations'."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: nat/inside."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "NAT_INSIDE_MISSING",
+          "fault": "LAN interface is missing the 'ip nat inside' configuration.",
+          "confidence": "High",
+          "evidence": "LAN interface reports NAT disabled while the WAN interface is configured as NAT outside.",
+          "next_command": "show ip interface <inside-interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "29",
+      "diagnosis": {
+        "case_id": "29",
+        "root_cause": "NAT access list 1 permits subnet 192.168.1.0/24, but the inside interface is configured on the 192.168.2.0/24 subnet, causing NAT translation to fail.",
+        "confidence": "high",
+        "evidence": [
+          "Router0# show ip nat translations output is empty, indicating no active translations.",
+          "Router0# show access-lists 1 shows the access list permits 192.168.1.0 0.0.0.255.",
+          "Router0# show ip interface brief shows GigabitEthernet0/0/1 is configured with IP address 192.168.2.1."
+        ],
+        "next_command": "show running-config | include access-list",
+        "fix_steps": [
+          "Modify access-list 1 to permit the correct LAN subnet (192.168.2.0/24).",
+          "Verify NAT translation and connectivity from the internal LAN devices."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: nat/inside."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "NAT_ACL_SUBNET_MISMATCH",
+          "fault": "NAT ACL matches 192.168.1.0/24, but the detected inside LAN address is outside that subnet.",
+          "confidence": "High",
+          "evidence": "ACL permits 192.168.1.0/24; detected LAN address(es): 192.168.2.1.",
+          "next_command": "show access-lists 1",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "30",
+      "diagnosis": {
+        "case_id": "30",
+        "root_cause": "Static NAT mapping has the inside global (public) and inside local (private) IP addresses inverted.",
+        "confidence": "high",
+        "evidence": [
+          "show ip nat translations shows inside global as 192.168.1.50 and inside local as 203.0.113.10.",
+          "Rule checker found that the static NAT mapping parameters are inverted."
+        ],
+        "next_command": "show running-config | include ip nat",
+        "fix_steps": [
+          "Remove the incorrect static NAT translation configuration.",
+          "Reconfigure the static NAT translation with the correct inside local private IP and inside global public IP.",
+          "Verify the translation table using show ip nat translations."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: nat/inside."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "STATIC_NAT_INVERTED",
+          "fault": "Static NAT mapping appears to have the public and private IP parameters inverted.",
+          "confidence": "High",
+          "evidence": "Inside global is 192.168.1.50 while inside local is 203.0.113.10.",
+          "next_command": "show ip nat translations",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "31",
+      "diagnosis": {
+        "case_id": "31",
+        "root_cause": "The DHCP pool is advertising an incorrect or unreachable DNS server address (192.168.10.254) which does not respond to ICMP pings.",
+        "confidence": "high",
+        "evidence": [
+          "PC0 receives DNS server 192.168.10.254 via DHCP.",
+          "Router0 cannot ping the DNS server at 192.168.10.254 (0% success rate)."
+        ],
+        "next_command": "show ip dhcp pool",
+        "fix_steps": [
+          "Verify the correct active IP address of the DNS server on the network.",
+          "Update the DHCP pool configuration on Router0 to advertise the correct DNS server IP.",
+          "Renew the IP configuration on PC0 and test DNS resolution again."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "DNS_SERVER_UNREACHABLE",
+          "fault": "DHCP server is advertising an incorrect or unreachable DNS server address 192.168.10.254 in its DHCP pool configuration.",
+          "confidence": "High",
+          "evidence": "DNS server address 192.168.10.254 is configured in DHCP pool, but pinging it fails with 0% success.",
+          "next_command": "show ip dhcp pool",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "32",
+      "diagnosis": {
+        "case_id": "32",
+        "root_cause": "The management switch virtual interface (SVI) Vlan99 is administratively down (shutdown), preventing remote management traffic.",
+        "confidence": "high",
+        "evidence": [
+          "Switch0 show ip interface brief shows Vlan99 status as administratively down.",
+          "Switch0 running-config for interface vlan 99 shows the shutdown command is applied."
+        ],
+        "next_command": "show running-config interface vlan 99",
+        "fix_steps": [
+          "Enter global configuration mode on Switch0.",
+          "Navigate to interface Vlan99.",
+          "Issue the no shutdown command.",
+          "Verify the SVI interface status is up and protocol is up using show ip interface brief."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "SVI_SHUTDOWN",
+          "fault": "Switch virtual interface (SVI) for the management VLAN (Vlan99) is administratively down (shutdown).",
+          "confidence": "High",
+          "evidence": "Interface Vlan99 is configured with IP 192.168.99.2 but status is administratively down.",
+          "next_command": "show running-config interface Vlan99",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "33",
+      "diagnosis": {
+        "case_id": "33",
+        "root_cause": "The host in the sales department is connected to Switch0 port FastEthernet0/10, which is incorrectly assigned to VLAN 20 (Marketing) instead of VLAN 10 (Sales).",
+        "confidence": "high",
+        "evidence": [
+          "Switch0 show running-config interface fa0/10 shows switchport access vlan 20.",
+          "Switch0 show vlan brief places interface fa0/10 in VLAN 20 (Marketing).",
+          "The symptom states the host is in the sales department, which maps to VLAN 10 based on show vlan brief."
+        ],
+        "next_command": "show running-config interface FastEthernet0/10",
+        "fix_steps": [
+          "Access Switch0 configuration mode.",
+          "Navigate to interface FastEthernet0/10.",
+          "Change the access VLAN to 10 using the command: switchport access vlan 10.",
+          "Verify the port is assigned to VLAN 10 and test DHCP and gateway reachability."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "WRONG_ACCESS_VLAN",
+          "fault": "Switch access port fa0/10 is assigned to the wrong VLAN (VLAN 20) instead of the expected VLAN.",
+          "confidence": "High",
+          "evidence": "Interface fa0/10 is configured with access VLAN 20, which does not match the host's subnet.",
+          "next_command": "show vlan brief",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "34",
+      "diagnosis": {
+        "case_id": "34",
+        "root_cause": "The OSPF routing process on Router0 is missing the network statement for the locally connected LAN network 192.168.10.0/24 on interface GigabitEthernet0/0/1.",
+        "confidence": "high",
+        "evidence": [
+          "Router0's OSPF configuration only includes the 10.1.1.0/30 network and lacks a statement for 192.168.10.0/24.",
+          "Router0's OSPF routing table is completely empty.",
+          "Interface GigabitEthernet0/0/1 is up and configured with IP address 192.168.10.1."
+        ],
+        "next_command": "show ip ospf interface GigabitEthernet0/0/1",
+        "fix_steps": [
+          "Enter global configuration mode on Router0.",
+          "Access the OSPF router configuration mode for router ospf 1.",
+          "Add the network statement for the LAN subnet (e.g., network 192.168.10.0 0.0.0.255 area 0).",
+          "Verify OSPF routing using show ip route ospf."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "OSPF_MISSING_NETWORK",
+          "fault": "OSPF routing process configuration is missing the network statement for the local LAN subnet.",
+          "confidence": "High",
+          "evidence": "OSPF config contains neighbor network statements but lacks LAN subnet, and OSPF route table is empty.",
+          "next_command": "show ip ospf interface",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "35",
+      "diagnosis": {
+        "case_id": "35",
+        "root_cause": "Dynamic NAT configuration is missing the 'overload' keyword, limiting translations to a single inside local IP address.",
+        "confidence": "high",
+        "evidence": [
+          "show ip nat translations displays only a single translation for 192.168.1.10.",
+          "show running-config shows the command 'ip nat inside source list 1 interface GigabitEthernet0/0/0' without the 'overload' keyword."
+        ],
+        "next_command": "show ip nat statistics",
+        "fix_steps": [
+          "Access global configuration mode on Router0.",
+          "Re-enter the NAT statement with the overload keyword: 'ip nat inside source list 1 interface GigabitEthernet0/0/0 overload'.",
+          "Verify multiple host translations using 'show ip nat translations'."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: nat/inside."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "PAT_MISSING_OVERLOAD",
+          "fault": "Dynamic NAT configuration is missing the 'overload' keyword at the end of the source mapping statement.",
+          "confidence": "High",
+          "evidence": "NAT inside source list statement is configured but misses the 'overload' parameter, limiting NAT to single IP mapping.",
+          "next_command": "show ip nat translations",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "36",
+      "diagnosis": {
+        "case_id": "36",
+        "root_cause": "The DHCP address pool has been completely exhausted, leading to allocation failures for newly connected PCs.",
+        "confidence": "high",
+        "evidence": [
+          "The DHCP pool utilization mark is at maximum capacity (30/30).",
+          "Leased addresses equal the total available range size.",
+          "Newly connected PCs fail to get an IP address via DHCP and fallback to APIPA addresses."
+        ],
+        "next_command": "show ip dhcp binding",
+        "fix_steps": [
+          "Expand the IP address range for the DHCP pool LAN_POOL to accommodate more clients.",
+          "Verify that the pool has available free addresses.",
+          "Test obtaining a DHCP lease from a newly connected PC."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "DHCP_POOL_EXHAUSTION",
+          "fault": "The DHCP server address pool is exhausted because the configured lease range is too small.",
+          "confidence": "High",
+          "evidence": "DHCP pool show output indicates utilization mark at maximum capacity (30/30) and client fallback to APIPA.",
+          "next_command": "show ip dhcp pool",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "37",
+      "diagnosis": {
+        "case_id": "37",
+        "root_cause": "Switch0 is missing the required ip default-gateway configuration, which prevents it from communicating with subnets outside of its own local VLAN 99.",
+        "confidence": "high",
+        "evidence": [
+          "show running-config | include ip default-gateway returned no output.",
+          "Switch0 can communicate on Vlan99 (192.168.99.10), but pinging 192.168.10.50 in a different subnet fails with a 0 percent success rate."
+        ],
+        "next_command": "show ip default-gateway",
+        "fix_steps": [
+          "Configure the default gateway on Switch0 using the command 'ip default-gateway <gateway_ip>'.",
+          "Verify the default gateway configuration with 'show ip default-gateway'.",
+          "Test SSH and ping connectivity from the IT office subnet (VLAN 10) to Switch0."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "SWITCH_MISSING_GATEWAY",
+          "fault": "Switch is missing the 'ip default-gateway' command, preventing management access from other subnets.",
+          "confidence": "High",
+          "evidence": "No 'ip default-gateway' is configured on the Layer 2 switch, and switch ping to other subnets fails.",
+          "next_command": "show running-config",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "38",
+      "diagnosis": {
+        "case_id": "38",
+        "root_cause": "DHCP server is disabled on the wireless router, preventing wireless clients from acquiring valid IP addresses.",
+        "confidence": "high",
+        "evidence": [
+          "Wireless-Client-1 ipconfig shows IPv4 address 0.0.0.0.",
+          "Wireless_Router running-config contains 'no ip dhcp server'."
+        ],
+        "next_command": "show ip dhcp pool",
+        "fix_steps": [
+          "Enable the DHCP service on the wireless router by removing the 'no ip dhcp server' command or configuring an active IP DHCP pool.",
+          "Verify that wireless clients successfully obtain an IP address via DHCP."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "WIRELESS_DHCP_DISABLED",
+          "fault": "The DHCP server on the wireless router's LAN interface is disabled, preventing wireless clients from acquiring IP addresses.",
+          "confidence": "High",
+          "evidence": "Configuration contains 'no ip dhcp server' on the wireless gateway, and client shows address 0.0.0.0.",
+          "next_command": "show running-config",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "39",
+      "diagnosis": {
+        "case_id": "39",
+        "root_cause": "Wireless authentication failure due to a mismatched WPA2 pre-shared key between the access point and the laptop.",
+        "confidence": "high",
+        "evidence": [
+          "Laptop authentication failed with Authentication Timeout/Key Mismatch.",
+          "AP configuration uses wpa-psk ascii SecretPassword123.",
+          "Laptop configuration uses wpa-psk ascii WrongPassword123."
+        ],
+        "next_command": "show wireless-connection",
+        "fix_steps": [
+          "Update the laptop wireless interface configuration to use the correct pre-shared key SecretPassword123.",
+          "Verify wireless authentication and connectivity to the Corp_WiFi network."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "WIRELESS_AUTH_FAILURE",
+          "fault": "Mismatched WPA2 pre-shared key (passphrase mismatch) configured on the wireless client.",
+          "confidence": "High",
+          "evidence": "AP configuration shows wpa-psk ascii SecretPassword123, but laptop wpa-psk ascii WrongPassword123.",
+          "next_command": "show wireless-connection",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "40",
+      "diagnosis": {
+        "case_id": "40",
+        "root_cause": "Standard access list 10 evaluates statements sequentially and has a 'deny any' rule at sequence 10, which blocks all traffic before the permit rule for 192.168.1.0/24 at sequence 20 can be evaluated.",
+        "confidence": "high",
+        "evidence": [
+          "Router0 shows access list 10 with '10 deny any' followed by '20 permit 192.168.1.0 0.0.0.255'.",
+          "GigabitEthernet0/0/0 has outgoing access list 10 applied."
+        ],
+        "next_command": "show running-config | include access-list",
+        "fix_steps": [
+          "Remove access list 10 from interface GigabitEthernet0/0/0 or remove the incorrect ACL entries.",
+          "Reconfigure access list 10 to first permit or deny specific hosts as intended, remembering the implicit deny at the end.",
+          "Reapply access list 10 to the interface and verify internet access."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "ACL_RULE_ORDERING",
+          "fault": "The standard ACL has a 'deny any' rule placed at the top, preventing subsequent permit rules from being evaluated.",
+          "confidence": "High",
+          "evidence": "ACL 10 shows 'deny any' at sequence 10 and 'permit 192.168.1.0/24' at sequence 20.",
+          "next_command": "show access-lists",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    }
+  ]
+}

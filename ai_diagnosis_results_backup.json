@@ -1,0 +1,701 @@
+{
+  "tool": "NetSage AI - AI Diagnosis Runner",
+  "total_cases": 21,
+  "successful_diagnoses": 18,
+  "failed_diagnoses": 3,
+  "ai_rule_agreements": 18,
+  "expected_fault_agreements": 18,
+  "results": [
+    {
+      "case_id": "10",
+      "diagnosis": {
+        "case_id": "10",
+        "root_cause": "Duplicate IP address conflict involving 192.168.1.10.",
+        "confidence": "high",
+        "evidence": [
+          "Intermittent ping loss and session drops with mixed success and timeout messages.",
+          "Cisco reports %IP-4-DUPADDR for 192.168.1.10 sourced by 00e0.8f3c.6901 on GigabitEthernet0/0/0."
+        ],
+        "next_command": "show arp",
+        "fix_steps": [
+          "Identify the two devices configured with the IP address 192.168.1.10.",
+          "Assign a unique IP address to one of the conflicting devices.",
+          "Verify network connectivity and check that the duplicate IP log message stops."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: duplicate/ip."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "DUPLICATE_IP",
+          "fault": "Duplicate IP address conflict involving 192.168.1.10.",
+          "confidence": "High",
+          "evidence": "Cisco reports a duplicate address for 192.168.1.10.",
+          "next_command": "show arp",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "11",
+      "diagnosis": {
+        "case_id": "11",
+        "root_cause": "Trunk port native VLAN mismatch between connected switches on interface FastEthernet0/1.",
+        "confidence": "high",
+        "evidence": [
+          "CDP reports native VLAN mismatch on FastEthernet0/1 (20) with Switch0 FastEthernet0/1 (10).",
+          "Show interface trunk displays the local Native vlan as 20 on port Fa0/1."
+        ],
+        "next_command": "show running-config interface FastEthernet0/1",
+        "fix_steps": [
+          "Configure the same native VLAN on both ends of the trunk link on interface FastEthernet0/1.",
+          "Verify that the CDP syslog error messages cease."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: native/vlan."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "NATIVE_VLAN_MISMATCH",
+          "fault": "Switch port native VLAN mismatch.",
+          "confidence": "High",
+          "evidence": "CDP reports a native VLAN mismatch: VLAN 20 versus VLAN 10.",
+          "next_command": "show interfaces trunk",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "12",
+      "diagnosis": {
+        "case_id": "12",
+        "root_cause": "Port security violation on FastEthernet0/1 caused the port to enter a Secure-shutdown state after a new computer was connected.",
+        "confidence": "high",
+        "evidence": [
+          "Interface FastEthernet0/1 changed state to administratively down.",
+          "Port security status is Secure-shutdown with a security violation count of 1."
+        ],
+        "next_command": "show interfaces FastEthernet0/1",
+        "fix_steps": [
+          "Disconnect the unauthorized or replacement device causing the violation if necessary, or update the maximum sticky MAC address limit.",
+          "Enter interface configuration mode for FastEthernet0/1.",
+          "Execute 'shutdown' followed by 'no shutdown' to recover the port from the secure-shutdown state."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: port/security."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "PORT_SECURITY_VIOLATION",
+          "fault": "Port security maximum violation caused the port to enter an err-disabled/shutdown state.",
+          "confidence": "High",
+          "evidence": "Port status is Secure-shutdown and Security Violation Count is 1.",
+          "next_command": "show port-security interface <interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "13",
+      "diagnosis": {
+        "case_id": "13",
+        "root_cause": "Router-on-a-Stick sub-interface GigabitEthernet0/0/0.10 is configured with encapsulation dot1Q 20 instead of VLAN 10.",
+        "confidence": "high",
+        "evidence": [
+          "The sub-interface name is GigabitEthernet0/0/0.10, indicating VLAN 10.",
+          "The configuration shows encapsulation dot1Q 20.",
+          "The rule checker identified a SUBINTERFACE_VLAN_MISMATCH."
+        ],
+        "next_command": "show running-config interface g0/0/0.10",
+        "fix_steps": [
+          "Enter global configuration mode and navigate to the sub-interface.",
+          "Reconfigure the encapsulation to use VLAN 10 with 'encapsulation dot1Q 10'.",
+          "Verify the configuration with 'show running-config interface g0/0/0.10'."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "SUBINTERFACE_VLAN_MISMATCH",
+          "fault": "Router-on-a-Stick sub-interface VLAN tag mismatch. Sub-interface g0/0/0.10 uses VLAN 20 instead of VLAN 10.",
+          "confidence": "High",
+          "evidence": "Interface suffix indicates VLAN 10, but encapsulation dot1Q uses VLAN 20.",
+          "next_command": "show running-config interface g0/0/0.10",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "14",
+      "diagnosis": {
+        "case_id": "14",
+        "root_cause": "The physical parent interface GigabitEthernet0/0/0 is administratively down, which forces all dependent sub-interfaces (GigabitEthernet0/0/0.10, GigabitEthernet0/0/0.20, and GigabitEthernet0/0/0.30) to remain down.",
+        "confidence": "high",
+        "evidence": [
+          "show ip interface brief indicates GigabitEthernet0/0/0 is administratively down.",
+          "All sub-interfaces associated with GigabitEthernet0/0/0 are also showing administratively down status."
+        ],
+        "next_command": "show running-config interface GigabitEthernet0/0/0",
+        "fix_steps": [
+          "Access global configuration mode on the router.",
+          "Navigate to interface GigabitEthernet0/0/0.",
+          "Execute the 'no shutdown' command to enable the parent interface.",
+          "Verify that the physical interface and all associated sub-interfaces come up using 'show ip interface brief'."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: parent/interface/down."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "PARENT_INTERFACE_DOWN",
+          "fault": "Parent interface GigabitEthernet0/0/0 is administratively down, causing dependent sub-interfaces to remain down.",
+          "confidence": "High",
+          "evidence": "GigabitEthernet0/0/0 is administratively down and 3 dependent sub-interface(s) are also down.",
+          "next_command": "show ip interface brief",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "15",
+      "diagnosis": {
+        "case_id": "15",
+        "root_cause": "EtherChannel bundle negotiation failure using LACP protocol, leaving member ports in stand-alone state.",
+        "confidence": "high",
+        "evidence": [
+          "show etherchannel summary indicates Group 1 Po1(SD) with LACP protocol.",
+          "Member ports Fa0/1 and Fa0/2 are in stand-alone (I) state instead of being in port-channel (P).",
+          "Symptom states that the Port-Channel bundle fails to negotiate."
+        ],
+        "next_command": "show running-config interface range FastEthernet 0/1 - 2",
+        "fix_steps": [
+          "Verify channel-group configuration and mode (e.g., active or desirable) on both ends of the link.",
+          "Ensure matching EtherChannel protocols and settings on the remote switch.",
+          "Verify the port status using show etherchannel summary after making corrections."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: etherchannel/protocol."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "ETHERCHANNEL_PROTOCOL_MISMATCH",
+          "fault": "EtherChannel protocol/mode mismatch is preventing the port-channel from forming.",
+          "confidence": "Medium",
+          "evidence": "show etherchannel summary reports LACP while member ports remain stand-alone (I), and the symptom states that the bundle fails to negotiate.",
+          "next_command": "show etherchannel summary",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "16",
+      "diagnosis": {
+        "case_id": "16",
+        "root_cause": "EtherChannel member ports FastEthernet0/1 and FastEthernet0/2 have mismatched allowed VLAN configurations causing consistency check failure.",
+        "confidence": "high",
+        "evidence": [
+          "%EC-5-CANNOT_BUNDLE2: Fa0/1 is not compatible with Fa0/2 and will be suspended.",
+          "FastEthernet0/1 has allowed VLANs 10,20 configured.",
+          "FastEthernet0/2 has allowed VLANs 10,30 configured."
+        ],
+        "next_command": "show etherchannel summary",
+        "fix_steps": [
+          "Configure identical allowed VLAN lists on both FastEthernet0/1 and FastEthernet0/2.",
+          "Verify that the Port-Channel comes up and member ports are bundled successfully using show etherchannel summary."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: etherchannel/vlan."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "ETHERCHANNEL_VLAN_MISMATCH",
+          "fault": "EtherChannel member ports have mismatched allowed VLAN lists.",
+          "confidence": "High",
+          "evidence": "fa0/1: VLANs 10,20, fa0/2: VLANs 10,30",
+          "next_command": "show etherchannel summary",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "17",
+      "diagnosis": {
+        "case_id": "17",
+        "root_cause": "The DHCP relay agent configuration is missing on the router sub-interface GigabitEthernet0/0.10.",
+        "confidence": "high",
+        "evidence": [
+          "PC0 fails to obtain a DHCP lease and remains at 0.0.0.0.",
+          "The configuration for GigabitEthernet0/0.10 does not contain an 'ip helper-address' command."
+        ],
+        "next_command": "show running-config interface GigabitEthernet0/0.10",
+        "fix_steps": [
+          "Access the router configuration mode.",
+          "Navigate to interface GigabitEthernet0/0.10.",
+          "Configure the 'ip helper-address' command pointing to the DHCP server IP address.",
+          "Verify DHCP lease acquisition on PC0."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: dhcp/relay."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "DHCP_RELAY_MISSING",
+          "fault": "DHCP relay agent is missing on GigabitEthernet0/0.10; no ip helper-address is configured.",
+          "confidence": "High",
+          "evidence": "DHCP failure evidence is present and GigabitEthernet0/0.10 has no ip helper-address in the supplied configuration.",
+          "next_command": "show running-config interface GigabitEthernet0/0.10",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "18",
+      "diagnosis": {
+        "case_id": "18",
+        "root_cause": "PortFast is incorrectly enabled on an inter-switch trunk port (FastEthernet0/1), which can cause temporary Layer 2 loops and topology instability.",
+        "confidence": "high",
+        "evidence": [
+          "Switch0 show interfaces fa0/1 trunk indicates Fa0/1 is operating as a trunk.",
+          "Switch0 show spanning-tree interface fa0/1 detail reports that the port is in the portfast mode."
+        ],
+        "next_command": "show spanning-tree interface FastEthernet0/1 detail",
+        "fix_steps": [
+          "Access global configuration mode on Switch0.",
+          "Enter interface configuration mode for FastEthernet0/1.",
+          "Disable PortFast on the trunk interface using the command 'no spanning-tree portfast'.",
+          "Verify Spanning Tree status and ensure PortFast is removed from the trunk link."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: portfast/trunk."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "PORTFAST_ON_TRUNK",
+          "fault": "PortFast is incorrectly enabled on an inter-switch trunk.",
+          "confidence": "High",
+          "evidence": "The interface is operating as a trunk while the spanning-tree output reports PortFast mode.",
+          "next_command": "show spanning-tree interface <interface> detail",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "19",
+      "diagnosis": {
+        "case_id": "19",
+        "root_cause": "Static route uses an invalid next-hop address 10.1.1.5 that is not on the directly connected subnet.",
+        "confidence": "high",
+        "evidence": [
+          "Router0 has a static route to 192.168.20.0/24 via 10.1.1.5.",
+          "Router0 is directly connected to 10.1.1.0/30 on GigabitEthernet0/0/0, making 10.1.1.5 unreachable.",
+          "Rule checker found that the next hop 10.1.1.5 does not belong to the directly connected network 10.1.1.0/30."
+        ],
+        "next_command": "show ip route static",
+        "fix_steps": [
+          "Remove the incorrect static route pointing to 10.1.1.5.",
+          "Configure a valid static route to 192.168.20.0/24 using the correct next-hop IP address (such as 10.1.1.2) or directly connected interface.",
+          "Verify the static route and test connectivity to PC1."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: static/route."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "INVALID_STATIC_NEXT_HOP",
+          "fault": "Static route to 192.168.20.0/24 uses an invalid next-hop address 10.1.1.5.",
+          "confidence": "High",
+          "evidence": "Configured next hop 10.1.1.5 does not belong to the directly connected network(s): 10.1.1.0/30.",
+          "next_command": "show ip route",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "20",
+      "diagnosis": {
+        "case_id": "20",
+        "root_cause": "Router1 is missing a return route to the 192.168.10.0/24 network.",
+        "confidence": "high",
+        "evidence": [
+          "Router1 routing table shows connected subnets 10.1.1.0/30 and 192.168.20.0/24, but no route to 192.168.10.0/24.",
+          "Router1 ping to 192.168.10.10 failed with a 0 percent success rate."
+        ],
+        "next_command": "show ip route 192.168.10.0",
+        "fix_steps": [
+          "Add a static route on Router1 for the remote network 192.168.10.0/24 pointing to the next-hop IP on Router0.",
+          "Verify the route is present in Router1's routing table.",
+          "Retest connectivity from PC0 to PC1."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: return/route."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "MISSING_RETURN_ROUTE",
+          "fault": "Reverse route to the remote 192.168.10.0/24 network is missing from Router1.",
+          "confidence": "High",
+          "evidence": "Router1 fails to ping the remote host and its supplied routing table contains no route to 192.168.10.0/24.",
+          "next_command": "show ip route 192.168.10.0",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "21",
+      "diagnosis": {
+        "case_id": "21",
+        "root_cause": "Floating static route is not properly configured as a backup because both static routes to 192.168.20.0/24 share the same administrative distance of 1, causing load balancing instead of failover.",
+        "confidence": "high",
+        "evidence": [
+          "Router0 running-config shows two static routes to 192.168.20.0/24 with next-hops 10.1.1.2 and 10.2.2.2 without explicit administrative distances.",
+          "Router0 show ip route output displays both 10.1.1.2 and 10.2.2.2 under Routing Descriptor Blocks with distance 1, resulting in traffic share count of 1 for both."
+        ],
+        "next_command": "show ip route 192.168.20.0",
+        "fix_steps": [
+          "Keep the primary static route to 192.168.20.0/24 with administrative distance 1.",
+          "Reconfigure the backup static route with a higher administrative distance (e.g., ip route 192.168.20.0 255.255.255.0 10.2.2.2 5).",
+          "Verify the routing table to ensure only the primary route is installed until it fails."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: static/route."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "FLOATING_STATIC_ROUTE_AD",
+          "fault": "Multiple static routes to 192.168.20.0/24 have the same administrative distance.",
+          "confidence": "High",
+          "evidence": "All detected static routes use AD 1; a backup route should use a higher AD than the primary route.",
+          "next_command": "show ip route 192.168.20.0",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "22",
+      "diagnosis": {
+        "case_id": "22",
+        "root_cause": "OSPF neighbor adjacency failure due to a mismatched Hello timer interval configuration.",
+        "confidence": "high",
+        "evidence": [
+          "Log message reports process 1 neighbor down because the Dead timer expired.",
+          "show ip ospf interface g0/0/0 displays non-default Hello interval configured as 5 seconds."
+        ],
+        "next_command": "show ip ospf neighbor",
+        "fix_steps": [
+          "Check OSPF timer configurations on both routers connected to the segment.",
+          "Ensure Hello and Dead timers match on both router interfaces to re-establish the adjacency.",
+          "Verify the OSPF neighbor state transitions back to FULL."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: ospf/hello."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "OSPF_HELLO_TIMER",
+          "fault": "OSPF Hello interval is configured as 5 seconds instead of the default 10 seconds.",
+          "confidence": "Medium",
+          "evidence": "show ip ospf interface reports Hello 5.",
+          "next_command": "show ip ospf interface <interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "23",
+      "diagnosis": {
+        "case_id": "23",
+        "root_cause": "OSPF area ID mismatch between Router0 (Area 0) and Router1 (Area 1) on GigabitEthernet0/0/0.",
+        "confidence": "high",
+        "evidence": [
+          "Cisco logs %OSPF-4-ERRRCV indicating an invalid packet due to an area ID mismatch from 10.1.1.2.",
+          "Router0 show ip ospf interface g0/0/0 shows Area 0.",
+          "Router1 show ip ospf interface g0/0/0 shows Area 1."
+        ],
+        "next_command": "show ip ospf neighbor",
+        "fix_steps": [
+          "Modify the OSPF configuration on either Router0 or Router1 so that both participating interfaces are configured in the same OSPF area.",
+          "Verify that the OSPF neighbor state transitions to FULL."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: ospf/area."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "OSPF_AREA_MISMATCH",
+          "fault": "OSPF area ID mismatch between neighboring interfaces.",
+          "confidence": "High",
+          "evidence": "Detected different OSPF areas: 0, 1.",
+          "next_command": "show ip ospf interface <interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "24",
+      "diagnosis": {
+        "case_id": "24",
+        "root_cause": "OSPF is configured as a passive interface on the transit link GigabitEthernet0/0/0, preventing Hello packets from being sent and stopping neighbor adjacency from establishing.",
+        "confidence": "high",
+        "evidence": [
+          "The output of show ip ospf interface g0/0/0 explicitly states 'No Hellos (Passive interface)'.",
+          "Hello packets are suppressed on the transit link."
+        ],
+        "next_command": "show running-config | section ospf",
+        "fix_steps": [
+          "Enter router OSPF configuration mode.",
+          "Remove the passive-interface configuration for GigabitEthernet0/0/0.",
+          "Verify OSPF neighbor adjacency status using show ip ospf neighbor."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: ospf/hello."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "OSPF_PASSIVE_INTERFACE",
+          "fault": "OSPF passive-interface is enabled on a transit link.",
+          "confidence": "High",
+          "evidence": "The OSPF interface output explicitly reports 'No Hellos (Passive interface)'.",
+          "next_command": "show ip ospf interface <interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "25",
+      "diagnosis": {
+        "case_id": "25",
+        "root_cause": "A standard IP access list (ACL 10) is applied inbound on the WAN interface GigabitEthernet0/0/0, leading to improper traffic filtering.",
+        "confidence": "high",
+        "evidence": [
+          "Router0 shows 'Inbound access list is 10' on GigabitEthernet0/0/0.",
+          "Access list 10 is defined as a Standard IP access list with a deny entry for 192.168.1.50."
+        ],
+        "next_command": "show ip interface GigabitEthernet0/0/0",
+        "fix_steps": [
+          "Remove the inbound standard ACL from GigabitEthernet0/0/0.",
+          "Reapply the access list in the correct direction or closer to the source if applicable."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI and expected fault share multiple diagnostic terms."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "STANDARD_ACL_DIRECTION",
+          "fault": "Standard ACL is applied inbound on the inspected interface; for the supplied WAN scenario this is the wrong direction.",
+          "confidence": "Medium",
+          "evidence": "Interface shows inbound ACL 10, and ACL 10 is a standard IP ACL.",
+          "next_command": "show ip interface <interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "26",
+      "diagnosis": {
+        "case_id": "26",
+        "root_cause": "The inbound ACL on the WAN interface permits ICMP traffic but lacks a rule to allow established TCP return traffic, causing web traffic failures.",
+        "confidence": "high",
+        "evidence": [
+          "Extended IP access list WAN_IN only contains a rule to permit icmp any any.",
+          "GigabitEthernet0/0/0 has WAN_IN set as its inbound access list."
+        ],
+        "next_command": "show access-lists WAN_IN",
+        "fix_steps": [
+          "Enter configuration mode and modify the WAN_IN access list.",
+          "Add a rule to permit established TCP traffic back into the network.",
+          "Verify web traffic functionality and access list application."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: established/tcp."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "MISSING_ESTABLISHED_TCP",
+          "fault": "Extended ACL permits ICMP but lacks a permit for established TCP traffic.",
+          "confidence": "High",
+          "evidence": "ACL contains an ICMP permit but no 'permit tcp ... established' rule.",
+          "next_command": "show access-lists",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "27",
+      "diagnosis": {
+        "case_id": "27",
+        "root_cause": "The inbound extended access list FILTER_LAN blocks DHCP (UDP 67/68) and DNS (UDP 53) traffic because it only permits TCP ports 80 (www) and 443.",
+        "confidence": "high",
+        "evidence": [
+          "Router0 shows an inbound access list FILTER_LAN on GigabitEthernet0/0.10.",
+          "FILTER_LAN only permits tcp 192.168.1.0 0.0.0.255 any eq www and eq 443.",
+          "DHCP and DNS traffic (UDP ports 53, 67, and 68) are not permitted and are dropped by the implicit deny at the end of the ACL."
+        ],
+        "next_command": "show access-lists FILTER_LAN",
+        "fix_steps": [
+          "Modify the access list FILTER_LAN to explicitly permit UDP traffic for DNS (port 53) and DHCP (ports 67 and 68).",
+          "Verify clients can successfully obtain IP leases and resolve hostnames."
+        ],
+        "rule_checker_agreement": "agree",
+        "human_review_required": true
+      },
+      "evaluation": {
+        "status": "agree",
+        "reason": "AI root cause matches the expected concept: dns/dhcp/udp."
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "ACL_BLOCKS_UDP_SERVICES",
+          "fault": "Extended ACL does not explicitly permit required DNS/DHCP UDP traffic.",
+          "confidence": "High",
+          "evidence": "Missing explicit permit(s): DNS/UDP 53, DHCP/UDP 67/68.",
+          "next_command": "show access-lists",
+          "expected_match": true
+        }
+      ],
+      "status": "success"
+    },
+    {
+      "case_id": "28",
+      "diagnosis": null,
+      "evaluation": {
+        "status": "error",
+        "reason": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15, model: gemini-3.5-flash-lite\\nPlease retry in 39.874275758s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.5-flash-lite'}, 'quotaValue': '15'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '39s'}]}}"
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "NAT_INSIDE_MISSING",
+          "fault": "LAN interface is missing the 'ip nat inside' configuration.",
+          "confidence": "High",
+          "evidence": "LAN interface reports NAT disabled while the WAN interface is configured as NAT outside.",
+          "next_command": "show ip interface <inside-interface>",
+          "expected_match": true
+        }
+      ],
+      "status": "error"
+    },
+    {
+      "case_id": "29",
+      "diagnosis": null,
+      "evaluation": {
+        "status": "error",
+        "reason": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15, model: gemini-3.5-flash-lite\\nPlease retry in 39.68719151s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.5-flash-lite', 'location': 'global'}, 'quotaValue': '15'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '39s'}]}}"
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "NAT_ACL_SUBNET_MISMATCH",
+          "fault": "NAT ACL matches 192.168.1.0/24, but the detected inside LAN address is outside that subnet.",
+          "confidence": "High",
+          "evidence": "ACL permits 192.168.1.0/24; detected LAN address(es): 192.168.2.1.",
+          "next_command": "show access-lists 1",
+          "expected_match": true
+        }
+      ],
+      "status": "error"
+    },
+    {
+      "case_id": "30",
+      "diagnosis": null,
+      "evaluation": {
+        "status": "error",
+        "reason": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15, model: gemini-3.5-flash-lite\\nPlease retry in 39.511099999s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.5-flash-lite'}, 'quotaValue': '15'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '39s'}]}}"
+      },
+      "rule_checker_findings": [
+        {
+          "rule": "STATIC_NAT_INVERTED",
+          "fault": "Static NAT mapping appears to have the public and private IP parameters inverted.",
+          "confidence": "High",
+          "evidence": "Inside global is 192.168.1.50 while inside local is 203.0.113.10.",
+          "next_command": "show ip nat translations",
+          "expected_match": true
+        }
+      ],
+      "status": "error"
+    }
+  ]
+}

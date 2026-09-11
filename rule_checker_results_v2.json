@@ -1,0 +1,569 @@
+{
+    "tool": "NetSage AI Rule Checker",
+    "version": "2.0",
+    "type": "deterministic_rule_checker",
+    "total_cases": 31,
+    "cases_with_findings": 31,
+    "cases_matching_expected": 31,
+    "agreement_percent": 100.0,
+    "results": [
+        {
+            "case": 10,
+            "symptom": "Intermittent ping loss and session drops. Pinging 192.168.1.10 results in mixed success (!) and timeout (.) messages. Switch MAC address table is rapidly reassigning ports (flapping).",
+            "expected_fault": "Duplicate IP address conflict. IP 192.168.1.10 is statically assigned to two different active endpoints in the same broadcast domain.",
+            "rule_findings": [
+                {
+                    "rule": "DUPLICATE_IP",
+                    "fault": "Duplicate IP address conflict involving 192.168.1.10.",
+                    "confidence": "High",
+                    "evidence": "Cisco reports a duplicate address for 192.168.1.10.",
+                    "next_command": "show arp",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 11,
+            "symptom": "CDP throws native VLAN mismatch syslog errors continuously. Potential untagged traffic leakage between broadcast domains.",
+            "expected_fault": "Switch port native VLAN mismatch. Switch A is expecting untagged traffic on VLAN 10, while Switch B is using VLAN 20.",
+            "rule_findings": [
+                {
+                    "rule": "NATIVE_VLAN_MISMATCH",
+                    "fault": "Switch port native VLAN mismatch.",
+                    "confidence": "High",
+                    "evidence": "CDP reports a native VLAN mismatch: VLAN 20 versus VLAN 10.",
+                    "next_command": "show interfaces trunk",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 12,
+            "symptom": "User lost network connection after replacing their computer. Switch port link status is physically down (red).",
+            "expected_fault": "Port security maximum violation. An unauthorized MAC address attempted to transmit on a locked-down port, forcing it into an err-disabled shutdown state.",
+            "rule_findings": [
+                {
+                    "rule": "PORT_SECURITY_VIOLATION",
+                    "fault": "Port security maximum violation caused the port to enter an err-disabled/shutdown state.",
+                    "confidence": "High",
+                    "evidence": "Port status is Secure-shutdown and Security Violation Count is 1.",
+                    "next_command": "show port-security interface <interface>",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 13,
+            "symptom": "End hosts in VLAN 10 cannot reach their default gateway or other subnets. Ping to gateway 192.168.10.1 times out.",
+            "expected_fault": "Router-on-a-Stick sub-interface VLAN tag mismatch. Sub-interface G0/0/0.10 is incorrectly configured with 802.1Q encapsulation for VLAN 20 instead of matching the access VLAN 10.",
+            "rule_findings": [
+                {
+                    "rule": "SUBINTERFACE_VLAN_MISMATCH",
+                    "fault": "Router-on-a-Stick sub-interface VLAN tag mismatch. Sub-interface g0/0/0.10 uses VLAN 20 instead of VLAN 10.",
+                    "confidence": "High",
+                    "evidence": "Interface suffix indicates VLAN 10, but encapsulation dot1Q uses VLAN 20.",
+                    "next_command": "show running-config interface g0/0/0.10",
+                    "expected_match": true,
+                    "evaluation_reason": "Semantic rule/evidence match."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 14,
+            "symptom": "All sub-interfaces remain in down/down status; complete loss of inter-VLAN routing across the network.",
+            "expected_fault": "Router-on-a-Stick physical interface admin down. The parent interface (G0/0/0) was never brought online with the 'no shutdown' command, forcing all dependent sub-interfaces down.",
+            "rule_findings": [
+                {
+                    "rule": "PARENT_INTERFACE_DOWN",
+                    "fault": "Parent interface GigabitEthernet0/0/0 is administratively down, causing dependent sub-interfaces to remain down.",
+                    "confidence": "High",
+                    "evidence": "GigabitEthernet0/0/0 is administratively down and 3 dependent sub-interface(s) are also down.",
+                    "next_command": "show ip interface brief",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 15,
+            "symptom": "The Port-Channel bundle fails to negotiate; ports operate independently and may cause spanning tree loops.",
+            "expected_fault": "EtherChannel Protocol / Mode Mismatch. Switch A is attempting LACP (active) while Switch B is attempting PAgP (desirable).",
+            "rule_findings": [
+                {
+                    "rule": "ETHERCHANNEL_PROTOCOL_MISMATCH",
+                    "fault": "EtherChannel protocol/mode mismatch is preventing the port-channel from forming.",
+                    "confidence": "Medium",
+                    "evidence": "show etherchannel summary reports LACP while member ports remain stand-alone (I), and the symptom states that the bundle fails to negotiate.",
+                    "next_command": "show etherchannel summary",
+                    "expected_match": true,
+                    "evaluation_reason": "Semantic rule/evidence match."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 16,
+            "symptom": "Port-Channel fails consistency checks, placing member ports in a suspended or unbundled state.",
+            "expected_fault": "EtherChannel Mismatched Allowed Trunk VLANs. Member ports of the same port-channel have conflicting allowed VLAN lists (VLAN 10,20 vs VLAN 10,30), causing the bundle to fail consistency checks.",
+            "rule_findings": [
+                {
+                    "rule": "ETHERCHANNEL_VLAN_MISMATCH",
+                    "fault": "EtherChannel member ports have mismatched allowed VLAN lists.",
+                    "confidence": "High",
+                    "evidence": "fa0/1: VLANs 10,20, fa0/2: VLANs 10,30",
+                    "next_command": "show etherchannel summary",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 17,
+            "symptom": "PC0 fails to obtain a DHCP lease and remains with IPv4 address 0.0.0.0, subnet mask 0.0.0.0 and default gateway 0.0.0.0.",
+            "expected_fault": "DHCP relay agent is missing on Router1 G0/0.10; ip helper-address 192.168.20.10 is not configured.",
+            "rule_findings": [
+                {
+                    "rule": "DHCP_RELAY_MISSING",
+                    "fault": "DHCP relay agent is missing on GigabitEthernet0/0.10; no ip helper-address is configured.",
+                    "confidence": "High",
+                    "evidence": "DHCP failure evidence is present and GigabitEthernet0/0.10 has no ip helper-address in the supplied configuration.",
+                    "next_command": "show running-config interface GigabitEthernet0/0.10",
+                    "expected_match": true,
+                    "evaluation_reason": "Semantic rule/evidence match."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 18,
+            "symptom": "STP is operating on a redundant three-switch topology, but an inter-switch trunk has PortFast enabled, creating a risk of temporary Layer-2 loops, broadcast storms, and MAC flapping during topology changes.",
+            "expected_fault": "PortFast was incorrectly enabled on Switch0 Fa0/1, which is an inter-switch trunk connected to Switch1 Fa0/1.",
+            "rule_findings": [
+                {
+                    "rule": "PORTFAST_ON_TRUNK",
+                    "fault": "PortFast is incorrectly enabled on an inter-switch trunk.",
+                    "confidence": "High",
+                    "evidence": "The interface is operating as a trunk while the spanning-tree output reports PortFast mode.",
+                    "next_command": "show spanning-tree interface <interface> detail",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault identifies PortFast on the inter-switch trunk."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 19,
+            "symptom": "PC0 cannot reach PC1 at 192.168.20.10 and ping fails with Request timed out or Destination host unreachable.",
+            "expected_fault": "Static route on Router0 uses incorrect next-hop IP 10.1.1.5 instead of the actual adjacent Router1 IP 10.1.1.2.",
+            "rule_findings": [
+                {
+                    "rule": "INVALID_STATIC_NEXT_HOP",
+                    "fault": "Static route to 192.168.20.0/24 uses an invalid next-hop address 10.1.1.5.",
+                    "confidence": "High",
+                    "evidence": "Configured next hop 10.1.1.5 does not belong to the directly connected network(s): 10.1.1.0/30.",
+                    "next_command": "show ip route",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 20,
+            "symptom": "PC0 cannot successfully communicate with PC1 at 192.168.20.10; ICMP requests time out because the return path is missing.",
+            "expected_fault": "Router1 is missing the reverse static route to 192.168.10.0/24 via Router0 at 10.1.1.1.",
+            "rule_findings": [
+                {
+                    "rule": "MISSING_RETURN_ROUTE",
+                    "fault": "Reverse route to the remote 192.168.10.0/24 network is missing from Router1.",
+                    "confidence": "High",
+                    "evidence": "Router1 fails to ping the remote host and its supplied routing table contains no route to 192.168.10.0/24.",
+                    "next_command": "show ip route 192.168.10.0",
+                    "expected_match": true,
+                    "evaluation_reason": "Semantic rule/evidence match."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 21,
+            "symptom": "Router0 treats the intended backup static route as equally preferred because both static routes have the same administrative distance of 1.",
+            "expected_fault": "Backup static route was configured with AD 1 instead of a higher AD such as 10, so it is not functioning as a floating backup route.",
+            "rule_findings": [
+                {
+                    "rule": "FLOATING_STATIC_ROUTE_AD",
+                    "fault": "Multiple static routes to 192.168.20.0/24 have the same administrative distance.",
+                    "confidence": "High",
+                    "evidence": "All detected static routes use AD 1; a backup route should use a higher AD than the primary route.",
+                    "next_command": "show ip route 192.168.20.0",
+                    "expected_match": true,
+                    "evaluation_reason": "Semantic rule/evidence match."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 22,
+            "symptom": "OSPF neighbor adjacency between Router0 and Router1 fails or drops after the Hello timer is changed on one side.",
+            "expected_fault": "OSPF Hello interval mismatch between Router0 and Router1. Router0 is configured with Hello 5 seconds while Router1 uses the default 10 seconds.",
+            "rule_findings": [
+                {
+                    "rule": "OSPF_HELLO_TIMER",
+                    "fault": "OSPF Hello interval is configured as 5 seconds instead of the default 10 seconds.",
+                    "confidence": "Medium",
+                    "evidence": "show ip ospf interface reports Hello 5.",
+                    "next_command": "show ip ospf interface <interface>",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 23,
+            "symptom": "OSPF neighbor adjacency between Router0 and Router1 fails to form or drops after the OSPF area is changed on one side.",
+            "expected_fault": "OSPF area ID mismatch: Router0 is configured for Area 0 while Router1 is configured for Area 1 on the same transit link.",
+            "rule_findings": [
+                {
+                    "rule": "OSPF_AREA_MISMATCH",
+                    "fault": "OSPF area ID mismatch between neighboring interfaces.",
+                    "confidence": "High",
+                    "evidence": "Detected different OSPF areas: 0, 1.",
+                    "next_command": "show ip ospf interface <interface>",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 24,
+            "symptom": "Hello packets are suppressed on the transit link; OSPF neighbor adjacency never establishes.",
+            "expected_fault": "passive-interface GigabitEthernet0/0/0 was issued under the OSPF process on a transit link.",
+            "rule_findings": [
+                {
+                    "rule": "OSPF_PASSIVE_INTERFACE",
+                    "fault": "OSPF passive-interface is enabled on a transit link.",
+                    "confidence": "High",
+                    "evidence": "The OSPF interface output explicitly reports 'No Hellos (Passive interface)'.",
+                    "next_command": "show ip ospf interface <interface>",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 25,
+            "symptom": "Ingress WAN traffic gets filtered unintentionally while the target outbound host traffic remains unblocked.",
+            "expected_fault": "Standard ACL applied in the wrong direction (ip access-group 10 in) on the egress WAN interface.",
+            "rule_findings": [
+                {
+                    "rule": "STANDARD_ACL_DIRECTION",
+                    "fault": "Standard ACL is applied inbound on the inspected interface; for the supplied WAN scenario this is the wrong direction.",
+                    "confidence": "Medium",
+                    "evidence": "Interface shows inbound ACL 10, and ACL 10 is a standard IP ACL.",
+                    "next_command": "show ip interface <interface>",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 26,
+            "symptom": "Internal hosts can perform ping tests, but web pages fail to load because return TCP packets are blocked.",
+            "expected_fault": "Extended ACL on WAN permits ICMP but is missing the \"permit tcp any any established\" rule.",
+            "rule_findings": [
+                {
+                    "rule": "MISSING_ESTABLISHED_TCP",
+                    "fault": "Extended ACL permits ICMP but lacks a permit for established TCP traffic.",
+                    "confidence": "High",
+                    "evidence": "ACL contains an ICMP permit but no 'permit tcp ... established' rule.",
+                    "next_command": "show access-lists",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 27,
+            "symptom": "Clients lose IP address leases or cannot resolve hostnames, despite direct IP reachability being active.",
+            "expected_fault": "Extended ACL implicitly denies UDP, lacking explicit permits for UDP 53 and UDP 67/68.",
+            "rule_findings": [
+                {
+                    "rule": "ACL_BLOCKS_UDP_SERVICES",
+                    "fault": "Extended ACL does not explicitly permit required DNS/DHCP UDP traffic.",
+                    "confidence": "High",
+                    "evidence": "Missing explicit permit(s): DNS/UDP 53, DHCP/UDP 67/68.",
+                    "next_command": "show access-lists",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault identifies the missing DNS/DHCP UDP permits."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 28,
+            "symptom": "Internal private IP packets pass to the Internet without translation; the upstream ISP drops them.",
+            "expected_fault": "Omitted the ip nat inside command on the LAN gateway interface.",
+            "rule_findings": [
+                {
+                    "rule": "NAT_INSIDE_MISSING",
+                    "fault": "LAN interface is missing the 'ip nat inside' configuration.",
+                    "confidence": "High",
+                    "evidence": "LAN interface reports NAT disabled while the WAN interface is configured as NAT outside.",
+                    "next_command": "show ip interface <inside-interface>",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 29,
+            "symptom": "LAN devices have a valid default gateway but cannot access external networks; translations table is empty.",
+            "expected_fault": "NAT ACL matches the wrong subnet (192.168.1.0 instead of 192.168.2.0).",
+            "rule_findings": [
+                {
+                    "rule": "NAT_ACL_SUBNET_MISMATCH",
+                    "fault": "NAT ACL matches 192.168.1.0/24, but the detected inside LAN address is outside that subnet.",
+                    "confidence": "High",
+                    "evidence": "ACL permits 192.168.1.0/24; detected LAN address(es): 192.168.2.1.",
+                    "next_command": "show access-lists 1",
+                    "expected_match": true,
+                    "evaluation_reason": "Semantic rule/evidence match."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 30,
+            "symptom": "External Internet users cannot reach the internal server via its public IP address.",
+            "expected_fault": "1-to-1 static NAT statement configured with inverted IP parameters (Public IP listed first).",
+            "rule_findings": [
+                {
+                    "rule": "STATIC_NAT_INVERTED",
+                    "fault": "Static NAT mapping appears to have the public and private IP parameters inverted.",
+                    "confidence": "High",
+                    "evidence": "Inside global is 192.168.1.50 while inside local is 203.0.113.10.",
+                    "next_command": "show ip nat translations",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 31,
+            "symptom": "PC0 obtains an IP address via DHCP and can ping the default gateway and external public IPs (e.g., 8.8.8.8), but cannot browse websites using domain names (e.g., www.example.com).",
+            "expected_fault": "DHCP server is advertising an incorrect or unreachable DNS server address (192.168.10.254) in its DHCP pool configuration.",
+            "rule_findings": [
+                {
+                    "rule": "DNS_SERVER_UNREACHABLE",
+                    "fault": "DHCP server is advertising an incorrect or unreachable DNS server address 192.168.10.254 in its DHCP pool configuration.",
+                    "confidence": "High",
+                    "evidence": "DNS server address 192.168.10.254 is configured in DHCP pool, but pinging it fails with 0% success.",
+                    "next_command": "show ip dhcp pool",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 32,
+            "symptom": "Switch0 is functioning normally and traffic flows between VLANs, but network administrators cannot telnet or SSH to the switch management IP (192.168.99.2) from another subnet.",
+            "expected_fault": "Switch virtual interface (SVI) for the management VLAN (Vlan99) is administratively down (shutdown).",
+            "rule_findings": [
+                {
+                    "rule": "SVI_SHUTDOWN",
+                    "fault": "Switch virtual interface (SVI) for the management VLAN (Vlan99) is administratively down (shutdown).",
+                    "confidence": "High",
+                    "evidence": "Interface Vlan99 is configured with IP 192.168.99.2 but status is administratively down.",
+                    "next_command": "show running-config interface Vlan99",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 33,
+            "symptom": "A host (PC0) in the sales department is connected to Switch port FastEthernet0/10. It cannot reach the sales gateway (192.168.10.1) or obtain a DHCP address. Pings to 192.168.10.1 fail.",
+            "expected_fault": "Switch access port FastEthernet0/10 is assigned to the wrong VLAN (VLAN 20/Marketing) instead of Vlan 10/Sales.",
+            "rule_findings": [
+                {
+                    "rule": "WRONG_ACCESS_VLAN",
+                    "fault": "Switch access port fa0/10 is assigned to the wrong VLAN (VLAN 20) instead of the expected VLAN.",
+                    "confidence": "High",
+                    "evidence": "Interface fa0/10 is configured with access VLAN 20, which does not match the host's subnet.",
+                    "next_command": "show vlan brief",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 34,
+            "symptom": "Router0 can ping its adjacent neighbors, but remote networks do not receive OSPF routes for the LAN network (192.168.10.0/24) connected to Router0's GigabitEthernet0/0/1 interface.",
+            "expected_fault": "Router0's OSPF process configuration is missing the network statement for the LAN subnet (192.168.10.0/24), so this network is not being advertised.",
+            "rule_findings": [
+                {
+                    "rule": "OSPF_MISSING_NETWORK",
+                    "fault": "OSPF routing process configuration is missing the network statement for the local LAN subnet.",
+                    "confidence": "High",
+                    "evidence": "OSPF config contains neighbor network statements but lacks LAN subnet, and OSPF route table is empty.",
+                    "next_command": "show ip ospf interface",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 35,
+            "symptom": "The first host on the LAN successfully connects to the Internet, but all subsequent hosts are unable to connect. Pings from host 2 to public IP addresses fail.",
+            "expected_fault": "Dynamic NAT configuration is missing the 'overload' keyword at the end of the source mapping statement, preventing multiple private hosts from sharing the single public WAN IP.",
+            "rule_findings": [
+                {
+                    "rule": "PAT_MISSING_OVERLOAD",
+                    "fault": "Dynamic NAT configuration is missing the 'overload' keyword at the end of the source mapping statement.",
+                    "confidence": "High",
+                    "evidence": "NAT inside source list statement is configured but misses the 'overload' parameter, limiting NAT to single IP mapping.",
+                    "next_command": "show ip nat translations",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 36,
+            "symptom": "Newly connected PCs in the training room fail to get an IP address via DHCP and fallback to APIPA addresses (169.254.x.x), while older PCs continue to work fine.",
+            "expected_fault": "The DHCP address pool is exhausted because the configured lease range is too small (only 21 addresses) for the number of devices in the training room.",
+            "rule_findings": [
+                {
+                    "rule": "DHCP_POOL_EXHAUSTION",
+                    "fault": "The DHCP server address pool is exhausted because the configured lease range is too small.",
+                    "confidence": "High",
+                    "evidence": "DHCP pool show output indicates utilization mark at maximum capacity (30/30) and client fallback to APIPA.",
+                    "next_command": "show ip dhcp pool",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 37,
+            "symptom": "Network administrators can ping and manage Switch0 from the local management VLAN (VLAN 99), but pings and SSH connections from the IT office in a different subnet (VLAN 10) time out.",
+            "expected_fault": "Switch0 is missing the 'ip default-gateway' command, preventing it from sending return traffic back to managing stations located in other subnets.",
+            "rule_findings": [
+                {
+                    "rule": "SWITCH_MISSING_GATEWAY",
+                    "fault": "Switch is missing the 'ip default-gateway' command, preventing management access from other subnets.",
+                    "confidence": "High",
+                    "evidence": "No 'ip default-gateway' is configured on the Layer 2 switch, and switch ping to other subnets fails.",
+                    "next_command": "show running-config",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 38,
+            "symptom": "Wireless clients can see and associate with the guest SSID \"Staff_WiFi\" successfully, but they are unable to access any network resources. Checking their network status shows they did not get an IP address (status is 0.0.0.0).",
+            "expected_fault": "The DHCP server on the wireless router's LAN interface is disabled, preventing wireless clients from acquiring IP addresses.",
+            "rule_findings": [
+                {
+                    "rule": "WIRELESS_DHCP_DISABLED",
+                    "fault": "The DHCP server on the wireless router's LAN interface is disabled, preventing wireless clients from acquiring IP addresses.",
+                    "confidence": "High",
+                    "evidence": "Configuration contains 'no ip dhcp server' on the wireless gateway, and client shows address 0.0.0.0.",
+                    "next_command": "show running-config",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 39,
+            "symptom": "A new office laptop fails to connect to the corporate Wi-Fi network. The status remains \"Connecting...\" or fails with a security mismatch error.",
+            "expected_fault": "Mismatched WPA2 pre-shared key (passphrase mismatch) configured on the wireless client compared to the access point's security settings.",
+            "rule_findings": [
+                {
+                    "rule": "WIRELESS_AUTH_FAILURE",
+                    "fault": "Mismatched WPA2 pre-shared key (passphrase mismatch) configured on the wireless client.",
+                    "confidence": "High",
+                    "evidence": "AP configuration shows wpa-psk ascii SecretPassword123, but laptop wpa-psk ascii WrongPassword123.",
+                    "next_command": "show wireless-connection",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        },
+        {
+            "case": 40,
+            "symptom": "The network engineer configured a standard ACL to block a host (192.168.1.10) from accessing the internet, but now all hosts in the subnet (192.168.1.0/24) are blocked from accessing the internet.",
+            "expected_fault": "The standard ACL has a 'deny any' rule placed at the top (sequence 10), which matches all traffic and prevents the subsequent 'permit' rule from being evaluated.",
+            "rule_findings": [
+                {
+                    "rule": "ACL_RULE_ORDERING",
+                    "fault": "The standard ACL has a 'deny any' rule placed at the top, preventing subsequent permit rules from being evaluated.",
+                    "confidence": "High",
+                    "evidence": "ACL 10 shows 'deny any' at sequence 10 and 'permit 192.168.1.0/24' at sequence 20.",
+                    "next_command": "show access-lists",
+                    "expected_match": true,
+                    "evaluation_reason": "Expected fault contains the rule's defining concepts."
+                }
+            ],
+            "rules_triggered": 1,
+            "matched_expected_fault": true
+        }
+    ]
+}

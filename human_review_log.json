@@ -1,0 +1,336 @@
+{
+  "tool": "NetSage AI - Human Review Log",
+  "reviewer": "Sakshi",
+  "reviews": [
+    {
+      "case_id": "10",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "Duplicate IP address conflict involving 192.168.1.10.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "11",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "Trunk native VLAN mismatch between connected switch ports.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "12",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "Port security violation caused interface FastEthernet0/1 to enter a secure-shutdown state after a new computer with a different MAC address was connected.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "13",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "Router-on-a-Stick sub-interface GigabitEthernet0/0/0.10 is configured with encapsulation dot1Q 20 instead of VLAN 10.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "14",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "The physical parent interface GigabitEthernet0/0/0 is administratively down, which forces all dependent sub-interfaces (GigabitEthernet0/0/0.10, GigabitEthernet0/0/0.20, and GigabitEthernet0/0/0.30) to remain down.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "15",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "EtherChannel bundle negotiation failure using LACP protocol, leaving member ports in stand-alone state.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "16",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "EtherChannel member ports FastEthernet0/1 and FastEthernet0/2 have mismatched allowed VLAN configurations causing consistency check failure.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "17",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "The DHCP relay agent configuration is missing on the router sub-interface GigabitEthernet0/0.10.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "18",
+      "status": "Edited",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI missed that the interface is an inter-switch trunk, which is the key error since PortFast should only be enabled on edge ports.",
+      "ai_root_cause": "PortFast is incorrectly enabled on an inter-switch trunk port (FastEthernet0/1), which can cause temporary Layer 2 loops and topology instability.",
+      "corrected_root_cause": "STP PortFast is incorrectly enabled on interface FastEthernet0/1, which is a trunk link connected to Switch1. This bypasses STP checks and creates a risk of Layer 2 loops.",
+      "corrected_fix_steps": [
+        "Enter interface configuration mode for FastEthernet0/1.",
+        "Disable PortFast with 'no spanning-tree portfast'.",
+        "Verify that spanning tree loop prevention is active on the trunk interface."
+      ],
+      "correction_summary": "The AI should have identified that the interface is an inter-switch trunk, making PortFast inappropriate and dangerous."
+    },
+    {
+      "case_id": "19",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "Static route uses an invalid next-hop address 10.1.1.5 that is not on the directly connected subnet.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "20",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "Router1 is missing a return route to the 192.168.10.0/24 network.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "21",
+      "status": "Edited",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI did not mention the exact cause: both static routes have the same administrative distance of 1.",
+      "ai_root_cause": "Floating static route is not properly configured as a backup because both static routes to 192.168.20.0/24 share the same administrative distance of 1, causing load balancing instead of failover.",
+      "corrected_root_cause": "Backup static route was configured with administrative distance 1 instead of a higher value (e.g., 10), so it is not functioning as a floating backup route but is instead active concurrently (equal-cost routing).",
+      "corrected_fix_steps": [
+        "Remove the incorrect backup static route: 'no ip route 192.168.20.0 255.255.255.0 10.2.2.2'.",
+        "Configure the floating static route with a higher AD: 'ip route 192.168.20.0 255.255.255.0 10.2.2.2 10'.",
+        "Verify routing table shows only the primary route under normal conditions."
+      ],
+      "correction_summary": "AI failed to specify the administrative distance mismatch that caused the backup route to be treated as equal to the primary."
+    },
+    {
+      "case_id": "22",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "OSPF neighbor adjacency failure due to a mismatched Hello timer interval configuration.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "23",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "OSPF area ID mismatch between Router0 (Area 0) and Router1 (Area 1) on GigabitEthernet0/0/0.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "24",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "OSPF is configured as a passive interface on the transit link GigabitEthernet0/0/0, preventing Hello packets from being sent and stopping neighbor adjacency from establishing.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "25",
+      "status": "Edited",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI missed the crucial detail that standard ACLs applied inbound on egress interfaces filter based on source, which blocks all WAN ingress.",
+      "ai_root_cause": "A standard IP access list (ACL 10) is applied inbound on the WAN interface GigabitEthernet0/0/0, leading to improper traffic filtering.",
+      "corrected_root_cause": "Standard ACL 10 is applied in the wrong direction (inbound 'in' instead of outbound 'out') on the GigabitEthernet0/0/0 egress interface.",
+      "corrected_fix_steps": [
+        "Enter interface configuration mode for GigabitEthernet0/0/0.",
+        "Remove the inbound ACL application: 'no ip access-group 10 in'.",
+        "Apply the access list in the correct direction or location if traffic filtering is required."
+      ],
+      "correction_summary": "The AI did not state that the standard ACL was applied inbound on the egress interface."
+    },
+    {
+      "case_id": "26",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "The inbound ACL on the WAN interface permits ICMP traffic but lacks a rule to allow established TCP return traffic, causing web traffic failures.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "27",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "The inbound extended access list FILTER_LAN blocks DHCP (UDP 67/68) and DNS (UDP 53) traffic because it only permits TCP ports 80 (www) and 443.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "28",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "The internal LAN interface GigabitEthernet0/0/1 is missing the 'ip nat inside' command, preventing Network Address Translation from functioning.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "29",
+      "status": "Edited",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI did not specify that the ACL matches 192.168.1.0/24 while the actual LAN subnet is 192.168.2.0/24.",
+      "ai_root_cause": "The NAT access list does not match the actual inside LAN subnet.",
+      "corrected_root_cause": "NAT Access List 1 is configured to permit subnet 192.168.1.0/24, which mismatches the actual LAN subnet of 192.168.2.0/24 configured on interface GigabitEthernet0/0/1.",
+      "corrected_fix_steps": [
+        "Update standard access-list 1 to match the actual LAN subnet: 'access-list 1 permit 192.168.2.0 0.0.0.255'.",
+        "Clear NAT translations table: 'clear ip nat translation *'.",
+        "Verify NAT translations are dynamically populated when LAN devices generate traffic."
+      ],
+      "correction_summary": "The AI failed to identify the specific subnet mismatch between the access list and the inside interface."
+    },
+    {
+      "case_id": "30",
+      "status": "Edited",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI did not point out that the inside local and inside global IPs were inverted in the command parameters.",
+      "ai_root_cause": "Static NAT mapping has the public and private IP addresses inverted.",
+      "corrected_root_cause": "Static NAT mapping has parameters inverted (configured with public IP first, i.e., 'ip nat inside source static 203.0.113.10 192.168.1.50' instead of local IP first).",
+      "corrected_fix_steps": [
+        "Remove the inverted static NAT configuration: 'no ip nat inside source static 203.0.113.10 192.168.1.50'.",
+        "Configure the correct static NAT command with local IP first: 'ip nat inside source static 192.168.1.50 203.0.113.10'.",
+        "Verify that external users can reach the internal server via the public IP."
+      ],
+      "correction_summary": "The AI did not state that the public and private IP parameters were inverted."
+    },
+    {
+      "case_id": "31",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "The DHCP server is advertising an unreachable DNS server address (192.168.10.254) to clients.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "32",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "The management switch virtual interface (SVI) Vlan99 is administratively down (shutdown), preventing management traffic to 192.168.99.2.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "33",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "The host in the sales department is connected to Switch0 port FastEthernet0/10, which is assigned to VLAN 20 (Marketing) instead of VLAN 10 (Sales).",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "34",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "The OSPF routing process on Router0 is missing the network statement for the locally connected LAN subnet (192.168.10.0/24).",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "35",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "Dynamic NAT configuration is missing the 'overload' keyword, preventing port address translation (PAT) and limiting NAT to a single simultaneous inside host translation.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "36",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "The DHCP address pool is exhausted because all available IP addresses in the configured range have been leased out.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "37",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "Switch0 is missing the default gateway configuration, preventing management traffic from communicating across subnets.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "38",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "DHCP server functionality is disabled on the wireless router, preventing clients from obtaining an IP address.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "39",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "Wireless authentication fails due to a pre-shared key mismatch between the access point and the laptop client.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    },
+    {
+      "case_id": "40",
+      "status": "Accepted",
+      "reviewed_at": "2026-09-03T15:11:01",
+      "reviewer_reason": "AI diagnosis is accurate and aligns with the expected lab fault.",
+      "ai_root_cause": "Standard ACL 10 has a 'deny any' statement at the top (sequence 10) before the permit statement, causing all traffic from the subnet to be blocked.",
+      "corrected_root_cause": "",
+      "corrected_fix_steps": [],
+      "correction_summary": ""
+    }
+  ]
+}

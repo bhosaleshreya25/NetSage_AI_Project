@@ -1,0 +1,281 @@
+[
+  {
+    "Cases": 10,
+    "symptom": "Intermittent ping loss and session drops. Pinging 192.168.1.10 results in mixed success (!) and timeout (.) messages. Switch MAC address table is rapidly reassigning ports (flapping).",
+    "outputs": "Router# show arp\nProtocol  Address          Age (min)  Hardware Addr   Type   Interface\nInternet  192.168.1.10            -   0030.f2a8.a601  ARPA   GigabitEthernet0/0/0\n\n%IP-4-DUPADDR: Duplicate address 192.168.1.10 on GigabitEthernet0/0/0, sourced by 00e0.8f3c.6901",
+    "expected fault": "Duplicate IP address conflict. IP 192.168.1.10 is statically assigned to two different active endpoints in the same broadcast domain.",
+    "OSI Layer": "Layer2/Layer 3",
+    "Concept": "ARP / IPv4 Addressing",
+    "severity": "High"
+  },
+  {
+    "Cases": 11,
+    "symptom": "CDP throws native VLAN mismatch syslog errors continuously. Potential untagged traffic leakage between broadcast domains.",
+    "outputs": "%CDP-4-NATIVE_VLAN_MISMATCH: Native VLAN mismatch discovered on FastEthernet0/1 (20), with Switch0 FastEthernet0/1 (10).\n\nSwitch#show interface trunk\nPort        Mode         Encapsulation  Status        Native vlan\nFa0/1       on           802.1q         trunking      20\n\nPort        Vlans allowed on trunk\nFa0/1       1-1005\n\nPort        Vlans allowed and active in management domain\nFa0/1       1,20\n\nPort        Vlans in spanning tree forwarding state and not pruned\nFa0/1       20",
+    "expected fault": "Switch port native VLAN mismatch. Switch A is expecting untagged traffic on VLAN 10, while Switch B is using VLAN 20.",
+    "OSI Layer": "Layer 2",
+    "Concept": "VLANs / Trunking / 802.1Q",
+    "severity": "Medium"
+  },
+  {
+    "Cases": 12,
+    "symptom": "User lost network connection after replacing their computer. Switch port link status is physically down (red).",
+    "outputs": "Switch(config-if)#switchport port-security mac-address sticky\nSwitch(config-if)#\n%LINK-5-CHANGED: Interface FastEthernet0/1, changed state to administratively down\n\n%LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/1, changed state to down\n\nSwitch(config-if)#^Z\nSwitch#\n%SYS-5-CONFIG_I: Configured from console by console\n\nSwitch#show port-security interface fa0/1\nPort Security              : Enabled\nPort Status                : Secure-shutdown\nViolation Mode             : Shutdown\nAging Time                 : 0 mins\nAging Type                 : Absolute\nSecureStatic Address Aging : Disabled\nMaximum MAC Addresses      : 1\nTotal MAC Addresses        : 1\nConfigured MAC Addresses   : 0\nSticky MAC Addresses       : 1\nLast Source Address:Vlan   : 0000.0CC9.CAAC:1\nSecurity Violation Count   : 1",
+    "expected fault": "Port security maximum violation. An unauthorized MAC address attempted to transmit on a locked-down port, forcing it into an err-disabled shutdown state.",
+    "OSI Layer": "Layer 2",
+    "Concept": "Port Security / Access Control",
+    "severity": "High"
+  },
+  {
+    "Cases": 13,
+    "symptom": "End hosts in VLAN 10 cannot reach their default gateway or other subnets. Ping to gateway 192.168.10.1 times out.",
+    "outputs": "Router# show running-config interface g0/0/0.10\nBuilding configuration...\n\nCurrent configuration : 124 bytes\n!\ninterface GigabitEthernet0/0/0.10\n encapsulation dot1Q 20\n ip address 192.168.10.1 255.255.255.0\nend",
+    "expected fault": "Router-on-a-Stick sub-interface VLAN tag mismatch. Sub-interface G0/0/0.10 is incorrectly configured with 802.1Q encapsulation for VLAN 20 instead of matching the access VLAN 10.",
+    "OSI Layer": "Layer 2 / Layer 3",
+    "Concept": "Inter-VLAN Routing / 802.1Q",
+    "severity": "High"
+  },
+  {
+    "Cases": 14,
+    "symptom": "All sub-interfaces remain in down/down status; complete loss of inter-VLAN routing across the network.",
+    "outputs": "Router# show ip interface brief\nInterface                  IP-Address      OK? Method Status                Protocol\nGigabitEthernet0/0/0       unassigned      YES unset  administratively down down\nGigabitEthernet0/0/0.10    192.168.10.1    YES manual administratively down down\nGigabitEthernet0/0/0.20    192.168.20.1    YES manual administratively down down\nGigabitEthernet0/0/0.30    192.168.30.1    YES manual administratively down down\nGigabitEthernet0/0/1       unassigned      YES unset  administratively down down\nGigabitEthernet0/0/2       unassigned      YES unset  administratively down down\nVlan1                      unassigned      YES unset  administratively down down",
+    "expected fault": "Router-on-a-Stick physical interface admin down. The parent interface (G0/0/0) was never brought online with the 'no shutdown' command, forcing all dependent sub-interfaces down.",
+    "OSI Layer": "Layer 1 / Layer 2",
+    "Concept": "Interface Administration",
+    "severity": "High"
+  },
+  {
+    "Cases": 15,
+    "symptom": "The Port-Channel bundle fails to negotiate; ports operate independently and may cause spanning tree loops.",
+    "outputs": "Switch#show etherchannel summary\nFlags:  D - down        P - in port-channel\n        I - stand-alone s - suspended\n        H - Hot-standby (LACP only)\n        R - Layer3      S - Layer2\n        U - in use      f - failed to allocate aggregator\n        u - unsuitable for bundling\n        w - waiting to be aggregated\n        d - default port\n\nNumber of channel-groups in use: 1\nNumber of aggregators:           1\n\nGroup  Port-channel  Protocol    Ports\n------+-------------+-----------+----------------------------------------------\n1      Po1(SD)           LACP   Fa0/1(I) Fa0/2(I)",
+    "expected fault": "EtherChannel Protocol / Mode Mismatch. Switch A is attempting LACP (active) while Switch B is attempting PAgP (desirable).",
+    "OSI Layer": "Layer 2",
+    "Concept": "EtherChannel / LACP / PAgP",
+    "severity": "Medium"
+  },
+  {
+    "Cases": 16,
+    "symptom": "Port-Channel fails consistency checks, placing member ports in a suspended or unbundled state.",
+    "outputs": "%EC-5-CANNOT_BUNDLE2: Fa0/1 is not compatible with Fa0/2 and will be suspended\n\nSwitch# show running-config interface fa0/1\nBuilding configuration...\n\nCurrent configuration : 110 bytes\n!\ninterface FastEthernet0/1\n switchport trunk allowed vlan 10,20\n switchport mode trunk\n channel-group 1 mode active\nend\n\nSwitch# show running-config interface fa0/2\nBuilding configuration...\n\nCurrent configuration : 110 bytes\n!\ninterface FastEthernet0/2\n switchport trunk allowed vlan 10,30\n switchport mode trunk\n channel-group 1 mode active\nend",
+    "expected fault": "EtherChannel Mismatched Allowed Trunk VLANs. Member ports of the same port-channel have conflicting allowed VLAN lists (VLAN 10,20 vs VLAN 10,30), causing the bundle to fail consistency checks.",
+    "OSI Layer": "Layer 2",
+    "Concept": "EtherChannel / Trunking",
+    "severity": "High"
+  },
+  {
+    "Cases": 17,
+    "symptom": "PC0 fails to obtain a DHCP lease and remains with IPv4 address 0.0.0.0, subnet mask 0.0.0.0 and default gateway 0.0.0.0.",
+    "outputs": "C:\\>ipconfig\n\nFastEthernet0 Connection:(default port)\n\n   Connection-specific DNS Suffix..: \n   Link-local IPv6 Address.........: FE80::201:97FF:FE54:1111\n   IPv4 Address....................: 0.0.0.0\n   Subnet Mask.....................: 0.0.0.0\n   Default Gateway.................: 0.0.0.0\n\nRouter1# show running-config interface g0/0.10\nBuilding configuration...\n\nCurrent configuration : 94 bytes\n!\ninterface GigabitEthernet0/0.10\n encapsulation dot1Q 10\n ip address 192.168.10.1 255.255.255.0\nend",
+    "expected fault": "DHCP relay agent is missing on Router1 G0/0.10; ip helper-address 192.168.20.10 is not configured.",
+    "OSI Layer": "Layer 3",
+    "Concept": "DHCP Relay",
+    "severity": "High"
+  },
+  {
+    "Cases": 18,
+    "symptom": "STP is operating on a redundant three-switch topology, but an inter-switch trunk has PortFast enabled, creating a risk of temporary Layer-2 loops, broadcast storms, and MAC flapping during topology changes.",
+    "outputs": "Switch0# show interfaces fa0/1 trunk\n\nPort        Mode             Encapsulation  Status        Native vlan\nFa0/1       on               802.1q         trunking      1\n\nSwitch0# show spanning-tree interface fa0/1 detail\n Port 1 (FastEthernet0/1) of VLAN1 is forwarding\n   Port path cost 19, Port priority 128, Port Identifier 128.1.\n   Designated root has priority 32769, address 0001.42A3.1111\n   Designated bridge has priority 32769, address 0001.42A3.1111\n   Designated port id is 128.1, designated path cost 0\n   Timers: message age 0, forward delay 0, hold 0\n   Number of transitions to forwarding state: 1\n   The port is in the portfast mode",
+    "expected fault": "PortFast was incorrectly enabled on Switch0 Fa0/1, which is an inter-switch trunk connected to Switch1 Fa0/1.",
+    "OSI Layer": "Layer 2",
+    "Concept": "STP / PortFast / Trunking",
+    "severity": "High"
+  },
+  {
+    "Cases": 19,
+    "symptom": "PC0 cannot reach PC1 at 192.168.20.10 and ping fails with Request timed out or Destination host unreachable.",
+    "outputs": "Router0# show ip route\nCodes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP\n       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area \n\nGateway of last resort is not set\n\n      10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks\nC        10.1.1.0/30 is directly connected, GigabitEthernet0/0/0\nL        10.1.1.1/32 is directly connected, GigabitEthernet0/0/0\nS     192.168.20.0/24 [1/0] via 10.1.1.5",
+    "expected fault": "Static route on Router0 uses incorrect next-hop IP 10.1.1.5 instead of the actual adjacent Router1 IP 10.1.1.2.",
+    "OSI Layer": "Layer 3",
+    "Concept": "Static Routing",
+    "severity": "High"
+  },
+  {
+    "Cases": 20,
+    "symptom": "PC0 cannot successfully communicate with PC1 at 192.168.20.10; ICMP requests time out because the return path is missing.",
+    "outputs": "Router1# show ip route\nCodes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP\n\nGateway of last resort is not set\n\n      10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks\nC        10.1.1.0/30 is directly connected, GigabitEthernet0/0/0\nL        10.1.1.2/32 is directly connected, GigabitEthernet0/0/0\n      192.168.20.0/24 is variably subnetted, 2 subnets, 2 masks\nC        192.168.20.0/24 is directly connected, GigabitEthernet0/0/1\nL        192.168.20.1/32 is directly connected, GigabitEthernet0/0/1\n\nRouter1# ping 192.168.10.10\nType escape sequence to abort.\nSending 5, 100-byte ICMP Echos to 192.168.10.10, timeout is 2 seconds:\n.....\nSuccess rate is 0 percent (0/5)",
+    "expected fault": "Router1 is missing the reverse static route to 192.168.10.0/24 via Router0 at 10.1.1.1.",
+    "OSI Layer": "Layer 3",
+    "Concept": "Static Routing / Return Route",
+    "severity": "High"
+  },
+  {
+    "Cases": 21,
+    "symptom": "Router0 treats the intended backup static route as equally preferred because both static routes have the same administrative distance of 1.",
+    "outputs": "Router0# show running-config | include ip route\nip route 192.168.20.0 255.255.255.0 10.1.1.2\nip route 192.168.20.0 255.255.255.0 10.2.2.2\n\nRouter0# show ip route 192.168.20.0\nRouting entry for 192.168.20.0/24\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.1.1.2\n      Route metric is 0, traffic share count is 1\n    10.2.2.2\n      Route metric is 0, traffic share count is 1",
+    "expected fault": "Backup static route was configured with AD 1 instead of a higher AD such as 10, so it is not functioning as a floating backup route.",
+    "OSI Layer": "Layer 3",
+    "Concept": "Static Routing / Administrative Distance",
+    "severity": "Medium"
+  },
+  {
+    "Cases": 22,
+    "symptom": "OSPF neighbor adjacency between Router0 and Router1 fails or drops after the Hello timer is changed on one side.",
+    "outputs": "%OSPF-5-ADJCHG: Process 1, Nbr 192.168.2.1 on GigabitEthernet0/0/0 from FULL to DOWN, Neighbor Down: Dead timer expired\n\nRouter0# show ip ospf interface g0/0/0\nGigabitEthernet0/0/0 is up, line protocol is up \n  Internet Address 10.1.1.1/30, Area 0, Attached via Network Statement\n  Process ID 1, Router ID 192.168.1.1, Network Type BROADCAST, Cost: 1\n  Topology-MTID    Cost    Disabled    Shutdown      Topology Name\n        0           1         no          no            Base\n  Transmit Delay is 1 sec, State DR, Priority 1\n  Designated Router (ID) 192.168.1.1, Interface address 10.1.1.1\n  No backup designated router on this network\n  Timer intervals configured, Hello 5, Dead 40, Wait 40, Retransmit 5",
+    "expected fault": "OSPF Hello interval mismatch between Router0 and Router1. Router0 is configured with Hello 5 seconds while Router1 uses the default 10 seconds.",
+    "OSI Layer": "Layer 3",
+    "Concept": "OSPF / Hello and Dead Timers",
+    "severity": "High"
+  },
+  {
+    "Cases": 23,
+    "symptom": "OSPF neighbor adjacency between Router0 and Router1 fails to form or drops after the OSPF area is changed on one side.",
+    "outputs": "%OSPF-4-ERRRCV: Received invalid packet: mismatch area ID, from backbone area must be virtual-link but not found from 10.1.1.2, GigabitEthernet0/0/0\n\nRouter0# show ip ospf interface g0/0/0\nGigabitEthernet0/0/0 is up, line protocol is up \n  Internet Address 10.1.1.1/30, Area 0, Attached via Network Statement\n  Process ID 1, Router ID 192.168.1.1, Network Type BROADCAST, Cost: 1\n\nRouter1# show ip ospf interface g0/0/0\nGigabitEthernet0/0/0 is up, line protocol is up \n  Internet Address 10.1.1.2/30, Area 1, Attached via Network Statement\n  Process ID 1, Router ID 192.168.2.1, Network Type BROADCAST, Cost: 1",
+    "expected fault": "OSPF area ID mismatch: Router0 is configured for Area 0 while Router1 is configured for Area 1 on the same transit link.",
+    "OSI Layer": "Layer 3",
+    "Concept": "OSPF / Area ID",
+    "severity": "High"
+  },
+  {
+    "Cases": 24,
+    "symptom": "Hello packets are suppressed on the transit link; OSPF neighbor adjacency never establishes.",
+    "outputs": "Router0# show ip ospf interface g0/0/0\nGigabitEthernet0/0/0 is up, line protocol is up \n  Internet Address 10.1.1.1/30, Area 0, Attached via Network Statement\n  Process ID 1, Router ID 192.168.1.1, Network Type BROADCAST, Cost: 1\n  Topology-MTID    Cost    Disabled    Shutdown      Topology Name\n        0           1         no          no            Base\n  Transmit Delay is 1 sec, State DR, Priority 1\n  No designated router on this network\n  No backup designated router on this network\n  Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5\n    oob-resync timeout 40\n    No Hellos (Passive interface)",
+    "expected fault": "passive-interface GigabitEthernet0/0/0 was issued under the OSPF process on a transit link.",
+    "OSI Layer": "Layer 3",
+    "Concept": "OSPF Routing",
+    "severity": "High"
+  },
+  {
+    "Cases": 25,
+    "symptom": "Ingress WAN traffic gets filtered unintentionally while the target outbound host traffic remains unblocked.",
+    "outputs": "Router0# show ip interface g0/0/0\nGigabitEthernet0/0/0 is up, line protocol is up (connected)\n  Internet address is 10.0.0.1/30\n  Broadcast address is 255.255.255.255\n  Address determined by setup command\n  MTU is 1500 bytes\n  Helper address is not set\n  Directed broadcast forwarding is disabled\n  Outgoing access list is not set\n  Inbound  access list is 10\n\nRouter0# show access-lists 10\nStandard IP access list 10\n    10 deny 192.168.1.50\n    20 permit any",
+    "expected fault": "Standard ACL applied in the wrong direction (ip access-group 10 in) on the egress WAN interface.",
+    "OSI Layer": "Layer 3",
+    "Concept": "Standard ACL",
+    "severity": "High"
+  },
+  {
+    "Cases": 26,
+    "symptom": "Internal hosts can perform ping tests, but web pages fail to load because return TCP packets are blocked.",
+    "outputs": "Router0# show access-lists WAN_IN\nExtended IP access list WAN_IN\n    10 permit icmp any any\n\nRouter0# show ip interface g0/0/0\nGigabitEthernet0/0/0 is up, line protocol is up (connected)\n  Internet address is 203.0.113.2/30\n  Outgoing access list is not set\n  Inbound  access list is WAN_IN",
+    "expected fault": "Extended ACL on WAN permits ICMP but is missing the \"permit tcp any any established\" rule.",
+    "OSI Layer": "Layer 4",
+    "Concept": "Extended ACL / TCP",
+    "severity": "High"
+  },
+  {
+    "Cases": 27,
+    "symptom": "Clients lose IP address leases or cannot resolve hostnames, despite direct IP reachability being active.",
+    "outputs": "Router0# show access-lists FILTER_LAN\nExtended IP access list FILTER_LAN\n    10 permit tcp 192.168.1.0 0.0.0.255 any eq www\n    20 permit tcp 192.168.1.0 0.0.0.255 any eq 443\n\nRouter0# show ip interface g0/0.10\nGigabitEthernet0/0.10 is up, line protocol is up (connected)\n  Internet address is 192.168.1.1/24\n  Outgoing access list is not set\n  Inbound  access list is FILTER_LAN",
+    "expected fault": "Extended ACL implicitly denies UDP, lacking explicit permits for UDP 53 and UDP 67/68.",
+    "OSI Layer": "Layer 7",
+    "Concept": "ACL / DNS / DHCP",
+    "severity": "High"
+  },
+  {
+    "Cases": 28,
+    "symptom": "Internal private IP packets pass to the Internet without translation; the upstream ISP drops them.",
+    "outputs": "Router0# show ip interface g0/0/1\nGigabitEthernet0/0/1 is up, line protocol is up (connected)\n  Internet address is 192.168.1.1/24\n  Broadcast address is 255.255.255.255\n  Network address translation is disabled\n\nRouter0# show ip interface g0/0/0\nGigabitEthernet0/0/0 is up, line protocol is up (connected)\n  Internet address is 203.0.113.2/30\n  Broadcast address is 255.255.255.255\n  Network address translation is outside",
+    "expected fault": "Omitted the ip nat inside command on the LAN gateway interface.",
+    "OSI Layer": "Layer 3",
+    "Concept": "NAT",
+    "severity": "High"
+  },
+  {
+    "Cases": 29,
+    "symptom": "LAN devices have a valid default gateway but cannot access external networks; translations table is empty.",
+    "outputs": "Router0# show ip nat translations\n\nRouter0# show access-lists 1\nStandard IP access list 1\n    10 permit 192.168.1.0 0.0.0.255\n\nRouter0# show ip interface brief\nInterface                  IP-Address      OK? Method Status                Protocol\nGigabitEthernet0/0/0       203.0.113.2     YES manual up                    up\nGigabitEthernet0/0/1       192.168.2.1     YES manual up                    up",
+    "expected fault": "NAT ACL matches the wrong subnet (192.168.1.0 instead of 192.168.2.0).",
+    "OSI Layer": "Layer 3",
+    "Concept": "PAT / NAT Overload",
+    "severity": "High"
+  },
+  {
+    "Cases": 30,
+    "symptom": "External Internet users cannot reach the internal server via its public IP address.",
+    "outputs": "Router0# show ip nat translations\nPro  Inside global     Inside local       Outside local      Outside global\n---  192.168.1.50      203.0.113.10       ---                ---",
+    "expected fault": "1-to-1 static NAT statement configured with inverted IP parameters (Public IP listed first).",
+    "OSI Layer": "Layer 3",
+    "Concept": "Static NAT",
+    "severity": "High"
+  },
+  {
+    "Cases": 31,
+    "symptom": "PC0 obtains an IP address via DHCP and can ping the default gateway and external public IPs (e.g., 8.8.8.8), but cannot browse websites using domain names (e.g., www.example.com).",
+    "outputs": "PC0> ipconfig /all\nFastEthernet0 Connection:\n   IPv4 Address....................: 192.168.10.50\n   Subnet Mask.....................: 255.255.255.0\n   Default Gateway.................: 192.168.10.1\n   DNS Server......................: 192.168.10.254\n\nRouter0# show running-config | section ip dhcp pool\nip dhcp pool LAN_POOL\n   network 192.168.10.0 255.255.255.0\n   default-router 192.168.10.1\n   dns-server 192.168.10.254\n\nRouter0# show ip interface brief | include 192.168.10\nGigabitEthernet0/0/0       192.168.10.1    YES manual up                    up\n\nRouter0# ping 192.168.10.254\nType escape sequence to abort.\nSending 5, 100-byte ICMP Echos to 192.168.10.254, timeout is 2 seconds:\n.....\nSuccess rate is 0 percent (0/5)",
+    "expected fault": "DHCP server is advertising an incorrect or unreachable DNS server address (192.168.10.254) in its DHCP pool configuration.",
+    "OSI Layer": "Layer 7",
+    "Concept": "DHCP / DNS Mismatch",
+    "severity": "High"
+  },
+  {
+    "Cases": 32,
+    "symptom": "Switch0 is functioning normally and traffic flows between VLANs, but network administrators cannot telnet or SSH to the switch management IP (192.168.99.2) from another subnet.",
+    "outputs": "Switch0# show ip interface brief\nInterface              IP-Address      OK? Method Status                Protocol\nVlan1                  unassigned      YES unset  up                    up\nVlan99                 192.168.99.2    YES manual administratively down down\nFastEthernet0/1        unassigned      YES unset  up                    up\nFastEthernet0/2        unassigned      YES unset  up                    up\n\nSwitch0# show running-config interface vlan 99\nBuilding configuration...\nCurrent configuration : 72 bytes\n!\ninterface Vlan99\n ip address 192.168.99.2 255.255.255.0\n shutdown\nend",
+    "expected fault": "Switch virtual interface (SVI) for the management VLAN (Vlan99) is administratively down (shutdown).",
+    "OSI Layer": "Layer 3 / Layer 2",
+    "Concept": "VLANs / SVI Down",
+    "severity": "Medium"
+  },
+  {
+    "Cases": 33,
+    "symptom": "A host (PC0) in the sales department is connected to Switch port FastEthernet0/10. It cannot reach the sales gateway (192.168.10.1) or obtain a DHCP address. Pings to 192.168.10.1 fail.",
+    "outputs": "Switch0# show mac address-table interface fa0/10\n          Mac Address Table\n-------------------------------------------\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n  20    0060.2f2a.1111    DYNAMIC     Fa0/10\n\nSwitch0# show running-config interface fa0/10\ninterface FastEthernet0/10\n switchport access vlan 20\n switchport mode access\nend\n\nSwitch0# show vlan brief\nVLAN Name                             Status    Ports\n---- -------------------------------- --------- -------------------------------\n1    default                          active    Fa0/1, Fa0/2, Fa0/3\n10   Sales                            active    Fa0/4, Fa0/5\n20   Marketing                        active    Fa0/10, Fa0/11",
+    "expected fault": "Switch access port FastEthernet0/10 is assigned to the wrong VLAN (VLAN 20/Marketing) instead of Vlan 10/Sales.",
+    "OSI Layer": "Layer 2",
+    "Concept": "Switchport VLAN Assignment",
+    "severity": "High"
+  },
+  {
+    "Cases": 34,
+    "symptom": "Router0 can ping its adjacent neighbors, but remote networks do not receive OSPF routes for the LAN network (192.168.10.0/24) connected to Router0's GigabitEthernet0/0/1 interface.",
+    "outputs": "Router0# show ip route ospf\n(No routes displayed)\n\nRouter0# show running-config | section router ospf\nrouter ospf 1\n router-id 1.1.1.1\n network 10.1.1.0 0.0.0.3 area 0\n\nRouter0# show ip interface brief\nInterface                  IP-Address      OK? Method Status                Protocol\nGigabitEthernet0/0/0       10.1.1.1        YES manual up                    up\nGigabitEthernet0/0/1       192.168.10.1    YES manual up                    up",
+    "expected fault": "Router0's OSPF process configuration is missing the network statement for the LAN subnet (192.168.10.0/24), so this network is not being advertised.",
+    "OSI Layer": "Layer 3",
+    "Concept": "OSPF / Missing Network Statement",
+    "severity": "High"
+  },
+  {
+    "Cases": 35,
+    "symptom": "The first host on the LAN successfully connects to the Internet, but all subsequent hosts are unable to connect. Pings from host 2 to public IP addresses fail.",
+    "outputs": "Router0# show ip nat translations\nPro  Inside global     Inside local       Outside local      Outside global\nicmp 203.0.113.10:1024 192.168.1.10:1024  8.8.8.8:1024       8.8.8.8:1024\n\nRouter0# show running-config | include ip nat inside source\nip nat inside source list 1 interface GigabitEthernet0/0/0\n\nRouter0# show access-lists 1\nStandard IP access list 1\n    10 permit 192.168.1.0 0.0.0.255",
+    "expected fault": "Dynamic NAT configuration is missing the 'overload' keyword at the end of the source mapping statement, preventing multiple private hosts from sharing the single public WAN IP.",
+    "OSI Layer": "Layer 3",
+    "Concept": "PAT / Missing Overload",
+    "severity": "High"
+  },
+  {
+    "Cases": 36,
+    "symptom": "Newly connected PCs in the training room fail to get an IP address via DHCP and fallback to APIPA addresses (169.254.x.x), while older PCs continue to work fine.",
+    "outputs": "Router0# show ip dhcp conflict\n(No conflicts found)\n\nRouter0# show ip dhcp pool LAN_POOL\nPool LAN_POOL :\n Utilization mark (30/30)\n Current index 192.168.1.30\n IP address range 192.168.1.10 to 192.168.1.30\n Leased addresses 21\n Pending addresses 0\n Declined addresses 0\n\nRouter0# show running-config | section ip dhcp pool\nip dhcp pool LAN_POOL\n   network 192.168.1.0 255.255.255.0\n   default-router 192.168.1.1\n   dns-server 8.8.8.8",
+    "expected fault": "The DHCP address pool is exhausted because the configured lease range is too small (only 21 addresses) for the number of devices in the training room.",
+    "OSI Layer": "Layer 7 / Layer 3",
+    "Concept": "DHCP / Pool Exhaustion",
+    "severity": "High"
+  },
+  {
+    "Cases": 37,
+    "symptom": "Network administrators can ping and manage Switch0 from the local management VLAN (VLAN 99), but pings and SSH connections from the IT office in a different subnet (VLAN 10) time out.",
+    "outputs": "Switch0# show running-config | include ip default-gateway\n(No output returned)\n\nSwitch0# show ip interface brief | include Vlan\nVlan99                 192.168.99.10   YES manual up                    up\n\nSwitch0# ping 192.168.10.50\nType escape sequence to abort.\nSending 5, 100-byte ICMP Echos to 192.168.10.50, timeout is 2 seconds:\n.....\nSuccess rate is 0 percent (0/5)",
+    "expected fault": "Switch0 is missing the 'ip default-gateway' command, preventing it from sending return traffic back to managing stations located in other subnets.",
+    "OSI Layer": "Layer 3",
+    "Concept": "Gateway / Switch Management",
+    "severity": "Medium"
+  },
+  {
+    "Cases": 38,
+    "symptom": "Wireless clients can see and associate with the guest SSID \"Staff_WiFi\" successfully, but they are unable to access any network resources. Checking their network status shows they did not get an IP address (status is 0.0.0.0).",
+    "outputs": "Wireless-Client-1> ipconfig\n   IPv4 Address....................: 0.0.0.0\n   Subnet Mask.....................: 0.0.0.0\n   Default Gateway.................: 0.0.0.0\n\nWireless_Router# show running-config | include dhcp\nno ip dhcp server\n\nWireless_Router# show ip interface brief\nInterface                  IP-Address      OK? Method Status                Protocol\nVlan1                      192.168.50.1    YES manual up                    up",
+    "expected fault": "The DHCP server on the wireless router's LAN interface is disabled, preventing wireless clients from acquiring IP addresses.",
+    "OSI Layer": "Layer 3 / Layer 2",
+    "Concept": "Wireless / DHCP Disabled",
+    "severity": "High"
+  },
+  {
+    "Cases": 39,
+    "symptom": "A new office laptop fails to connect to the corporate Wi-Fi network. The status remains \"Connecting...\" or fails with a security mismatch error.",
+    "outputs": "Laptop0# show wireless-connection interface wlan0\nSSID: Corp_WiFi\nSecurity: WPA2-Personal\nAuthentication: Failed (Authentication Timeout/Key Mismatch)\n\nAP0# show running-config | section dot11 ssid\ndot11 ssid Corp_WiFi\n   authentication open\n   authentication key-management wpa version 2\n   wpa-psk ascii 0 SecretPassword123\n\nLaptop0# show running-config interface wlan0\ninterface Dot11Radio0\n   ssid Corp_WiFi\n   wpa-psk ascii WrongPassword123",
+    "expected fault": "Mismatched WPA2 pre-shared key (passphrase mismatch) configured on the wireless client compared to the access point's security settings.",
+    "OSI Layer": "Layer 2 / Layer 1",
+    "Concept": "Wireless / Security Mismatch",
+    "severity": "High"
+  },
+  {
+    "Cases": 40,
+    "symptom": "The network engineer configured a standard ACL to block a host (192.168.1.10) from accessing the internet, but now all hosts in the subnet (192.168.1.0/24) are blocked from accessing the internet.",
+    "outputs": "Router0# show access-lists 10\nStandard IP access list 10\n    10 deny any\n    20 permit 192.168.1.0 0.0.0.255\n\nRouter0# show ip interface g0/0/0\nGigabitEthernet0/0/0 is up, line protocol is up\n  Internet address is 203.0.113.2/30\n  Outgoing access list is 10",
+    "expected fault": "The standard ACL has a 'deny any' rule placed at the top (sequence 10), which matches all traffic and prevents the subsequent 'permit' rule from being evaluated.",
+    "OSI Layer": "Layer 3",
+    "Concept": "ACL Rule Order",
+    "severity": "High"
+  }
+]
